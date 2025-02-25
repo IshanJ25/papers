@@ -116,7 +116,7 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position="top-right" reverseOrder={false} />
-          <Banner />
+        
           {children}
         </ThemeProvider>
       </body>
