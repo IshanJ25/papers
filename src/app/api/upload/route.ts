@@ -7,10 +7,19 @@ import { type ICourses, type CloudinaryUploadResult } from "@/interface";
 import { PaperAdmin } from "@/db/papers";
 import axios from "axios";
 // TODO: REMOVE THUMBNAIL FROM admin-buffer DB
-cloudinary.v2.config({
-  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_SECRET,
+const cloudinaryConfig1 = cloudinary.v2;
+cloudinaryConfig1.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_1,
+  api_key: process.env.CLOUDINARY_API_KEY_1,
+  api_secret: process.env.CLOUDINARY_SECRET_1,
+});
+
+// Config 2: Secondary Cloudinary account
+const cloudinaryConfig2 = cloudinary.v2;
+cloudinaryConfig2.config({
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_2,
+  api_key: process.env.CLOUDINARY_API_KEY_2,
+  api_secret: process.env.CLOUDINARY_SECRET_2,
 });
 
 export async function POST(req: Request) {
