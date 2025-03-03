@@ -104,6 +104,7 @@ export async function POST(req: Request) {
       .replace(/<img src='|'\s*\/>/g, "");
     const paper = new PaperAdmin({
       public_id_cloudinary,
+      cloudinary_index: configIndex,
       finalUrl,
       thumbnailUrl,
       subject,
