@@ -50,7 +50,9 @@ export async function POST(req: Request) {
     if (!process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET) {
       return NextResponse.json({ message: "ServerMisconfig" }, { status: 500 });
     }
-    const count: number = await Paper.countDocuments();
+    await connectToDatabase();
+
+    const count: number = await PaperAdmin.countDocuments();
     const configIndex = count % cloudinaryConfigs.length;
     const selectedConfig = cloudinaryConfigs[configIndex];
     cloudinary.v2.config(selectedConfig);
@@ -66,7 +68,7 @@ export async function POST(req: Request) {
       const bytes = await files[0]?.arrayBuffer();
       if (bytes) {
         const buffer = Buffer.from(bytes);
-        imageURL = `data:${"image/png"};base64,${buffer.toString("base64")}`;
+        imageURL = buffer.toString("base64"); // Plain Base64 string, no data URL prefix
       }
     }
     const tags = await processAndAnalyze({ imageURL });
@@ -125,7 +127,6 @@ export async function POST(req: Request) {
 
     // If all checks pass, continue with the rest of the logic
 
-    await connectToDatabase();
     let finalUrl: string | undefined = "";
     let public_id_cloudinary: string | undefined = "";
     let thumbnailUrl: string | undefined = "";

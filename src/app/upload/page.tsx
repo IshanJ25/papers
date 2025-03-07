@@ -37,7 +37,7 @@ async function pdfToImage(file: File) {
   await pdfPage.render({ canvasContext: context, viewport }).promise;
 
   // Convert the canvas to the desired output (Buffer, base64, etc.)
-  return canvas.toDataURL(); // Returns a Base64 string
+  return canvas.toDataURL().replace(/^data:image\/\w+;base64,/, "");
 }
 
 const Page = () => {
