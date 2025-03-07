@@ -3,6 +3,7 @@ import { IPaper, type IAdminPaper, type ICourses } from "@/interface";
 
 const adminSchema = new Schema<IAdminPaper>({
   public_id_cloudinary: { type: String, required: true },
+  cloudinary_index: { type: Number, required: true },
   finalUrl: { type: String, required: true },
   thumbnailUrl: { type: String, required: true },
   subject: { type: String, required: true, index: true },

@@ -71,6 +71,7 @@ export interface IAdminPaper {
   year: string;
   exam: "CAT-1" | "CAT-2" | "FAT" | "Model";
   semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
+  cloudinary_index: number;
   campus:
     | "Vellore"
     | "Chennai"
