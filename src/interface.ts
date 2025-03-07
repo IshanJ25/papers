@@ -96,8 +96,9 @@ export interface IAdminUpload {
   exam: "CAT-1" | "CAT-2" | "FAT";
   isPdf: boolean;
 }
-export interface PostPDFToCloudinary {
-  status: boolean;
+export interface APIResponse {
+  message: string;
+  status: number;
 }
 export interface ConverttoPDFResponse {
   url: string;
@@ -147,10 +148,10 @@ export interface IPaper {
   answerKeyIncluded?: boolean;
 }
 export type ExamDetail = {
-  "course-name": string;
+  subject: string;
   slot: string;
   "course-code": string;
-  "exam-type": string;
+  "exam": string;
   semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
   year: string;
 };

@@ -1,17 +1,18 @@
 "use client";
 import React, { useState } from "react";
-import axios from "axios";
+import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { handleAPIError } from "../../util/error";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { type PostPDFToCloudinary } from "@/interface";
+import { type APIResponse } from "@/interface";
 import Dropzone from "react-dropzone";
 
 import { createCanvas } from "canvas";
 import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
 import { PDFDocument } from "pdf-lib";
+import { ApiError } from "next/dist/server/api-utils";
 async function pdfToImage(file: File) {
   GlobalWorkerOptions.workerSrc =
     "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
@@ -120,7 +121,7 @@ const Page = () => {
     if (isPdf && files[0]) {
       formData.append("image", await pdfToImage(files[0]));
     }
-    
+
     // formData.append("exam", exam);
     formData.append("campus", campus);
 
@@ -130,11 +131,27 @@ const Page = () => {
 
     try {
       await toast.promise(
-        axios.post<PostPDFToCloudinary>("/api/ai-upload", formData),
+        async () => {
+          try {
+            await axios.post<APIResponse>(
+              "/api/ai-upload",
+              formData,
+            );
+          } catch (error) {
+            if (error instanceof AxiosError && error.response?.data ) {
+              const errorData = error.response.data as APIResponse;
+              const errorMessage = errorData.message || "Failed to upload papers";
+              throw new Error(errorMessage);
+            }
+            throw new Error("Failed to upload papers");
+          }
+        },
         {
           loading: "Uploading papers...",
           success: "Papers uploaded successfully!",
-          error: "Failed to upload papers. Please try again.",
+          error: (error: Error) => {
+            return error.message;
+          },
         },
       );
 

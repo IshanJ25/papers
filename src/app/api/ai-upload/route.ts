@@ -16,10 +16,9 @@ import type {
   ExamDetail,
   IAdminPaper,
 } from "@/interface";
-import Paper, { PaperAdmin } from "@/db/papers";
+import { PaperAdmin } from "@/db/papers";
 import axios from "axios";
 import processAndAnalyze from "@/util/gemini";
-import { examMap } from "./map";
 import Fuse from "fuse.js";
 // import processAndAnalyze from "./mistral";
 // TODO: REMOVE THUMBNAIL FROM admin-buffer DB
@@ -68,7 +67,7 @@ export async function POST(req: Request) {
       const bytes = await files[0]?.arrayBuffer();
       if (bytes) {
         const buffer = Buffer.from(bytes);
-        imageURL = buffer.toString("base64"); // Plain Base64 string, no data URL prefix
+        imageURL = buffer.toString("base64"); 
       }
     }
     const tags = await processAndAnalyze({ imageURL });
@@ -76,9 +75,14 @@ export async function POST(req: Request) {
     console.log(" tags:", tags);
 
     const finalTags = await setTagsFromCurrentLists(tags);
-    const subject = finalTags["course-name"];
+    console.log(" tags:", finalTags);
+    if(!tags)
+    {
+      return null;
+    }
+    const subject = finalTags.subject;
     const slot = finalTags.slot;
-    const exam = finalTags["exam-type"];
+    const exam = finalTags.exam
     const year = finalTags.year;
     const campus = formData.get("campus") as string;
     const semester = finalTags.semester;
@@ -267,37 +271,40 @@ async function setTagsFromCurrentLists(
   }
 
   const newTags: ExamDetail = {
-    "course-name": courses[0],
+    "subject": courses[0],
     slot: slots[0],
     "course-code": "notInUse",
-    "exam-type": exams[0],
+    "exam": exams[0],
     semester: semesters[0] as SemesterType,
     year: years[0],
   };
+  
   const coursesFuzy = new Fuse(courses);
   if (!tags) {
     console.log("Anaylsis failed setting random courses as fields");
     return newTags;
   } else {
     const subjectSearch = coursesFuzy.search(
-      tags["course-name"] + "|" + tags["course-code"],
+      tags.subject ,
     )[0];
     if (subjectSearch) {
-      newTags["course-name"] = subjectSearch.item;
+      newTags.subject = subjectSearch.item;
     }
     const slotSearchResult = findMatch(slots, tags.slot);
     if (slotSearchResult) {
       newTags.slot = slotSearchResult;
     }
-    if ("exam-type" in tags && tags["exam-type"] in examMap) {
-      const examType = tags["exam-type"] as keyof typeof examMap;
-      newTags["exam-type"] = examMap[examType];
+    const examSearchResult = findMatch(exams, tags.exam);
+    if (examSearchResult) {
+      newTags.exam = examSearchResult;
     }
     const semesterSearchResult = findMatch(semesters, tags.semester);
     if (semesterSearchResult) {
       newTags.semester = semesterSearchResult as SemesterType;
+
     }
     const yearSearchResult = findMatch(years, tags.year);
+
     if (yearSearchResult) {
       newTags.year = yearSearchResult;
     }

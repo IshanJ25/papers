@@ -73,14 +73,14 @@ function parseExamDetail(analysis: string): ExamDetail {
       if (examDetail.semester) {
         const validSemesters = ["Fall Semester", "Winter Semester", "Summer Semester", "Weekend Semester"];
         if (!validSemesters.includes(examDetail.semester)) {
-          examDetail.semester = "Fall Semester"; // Default to Fall Semester if invalid
+          examDetail.semester = "Fall Semester"; 
         }
       }
       
       if (examDetail.year) {
         const yearPattern = /^\d{4}$/;
         if (!yearPattern.test(examDetail.year)) {
-          examDetail.year = new Date().getFullYear().toString(); // Default to current year if invalid
+          examDetail.year = new Date().getFullYear().toString(); 
         }
       }
       return examDetail
@@ -90,10 +90,10 @@ function parseExamDetail(analysis: string): ExamDetail {
   } catch (error) {
     console.error("Error parsing exam details:", error);
     return {
-      "course-name": "Unknown",
+      "subject": "Unknown",
       slot: "Unknown",
       "course-code": "Unknown",
-      "exam-type": "Unknown",
+      "exam": "Unknown",
       semester: "Fall Semester",
       year: new Date().getFullYear().toString() 
     };
@@ -114,8 +114,18 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
 
     // const dataUrl = `data:image/png;base64,${imageBase64}`;
 
-    const prompt = `This is an image of a question paper. I want you to extract the Exam name, there can be three: final assessment test, continuous assessment test 1, continuous assessment test 2.Now Final assessment should be labelled as FAT, Continuous assessment 1 should be labelled as CAT1 and Continuous assessment 2 should be labelled as CAT2. Also I want you to find me the semester it is from, there can be four: Fall Semester, Winter Semester, Summer Semester, Weekend Semester. Fall semester lasts form july to end of the year and winter from january to april, rest is summer semester.Do not put weekend semester if you dont see it in the image. Also find me the year of the exam and the slot of the exam, they look something like this : A1, A1+TA1, B2+BT2, C1+TC1+TCC1 etc.Instead of the entire slot though i just require the initial, alphaber and number part before the plus sign. And I also require the course title and the course code from the paper. Course code looks something like : BCSE202P, BCSE307L etc. if you unable to find return NOT FOUND also format your output into a .json format. most importantly if you are unsure of anything at all just return NOT FOUND`;
+    const prompt = `This is an image of a question paper. I want you to extract the Exam name, there can be three: final assessment test, continuous assessment test 1, continuous assessment test 2.Now Final assessment should be labelled as FAT, Continuous assessment 1 should be labelled as CAT-1 and Continuous assessment 2 should be labelled as CAT-2. Also I want you to find me the semester it is from, there can be four: Fall Semester, Winter Semester, Summer Semester, Weekend Semester. Fall semester lasts form july to end of the year and winter from january to May inclusive , summer semester is from june to july. Do not put weekend semester if you dont see it in the image. Also find me the year of the exam and the slot of the exam, they look something like this : A1, A1+TA1, B2+BT2, C1+TC1+TCC1 etc.Instead of the entire slot though i just require the initial, alphaber and number part before the plus sign. And I also require the course title and the course code from the paper. Course code looks something like : BCSE202P, BCSE307L etc. if you unable to find return NOT FOUND also format your output into a .json format. most importantly if you are unsure of anything at all just return NOT FOUND
 
+    make sure to return the output in the following format:
+    {
+    subject: "course title [course code]"
+    exam: "exam type" 
+    year: year
+    slot: "A1/A2/B1 etc "
+    semester: "semester"
+    }
+        
+    `;
     const image = {
       inlineData: {
         data: dataUrl,
@@ -128,8 +138,8 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
     const chatResponse = result.response.text();
     const rawAnalysis =  chatResponse;
 
+    console.log(rawAnalysis)
     const examDetail: ExamDetail = parseExamDetail(rawAnalysis);
-
     results.push({
       examDetail,
       rawAnalysis,
@@ -144,10 +154,10 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
     return [
       {
         examDetail: {
-          "course-name": "Error",
+          "subject": "Error",
           slot: "Error",
           "course-code": "Error",
-          "exam-type": "Error",
+          "exam": "Error",
           semester: "Fall Semester", 
           year: new Date().getFullYear().toString()
         },

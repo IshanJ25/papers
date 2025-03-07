@@ -7,7 +7,7 @@ import { handleAPIError } from "../../util/error";
 import { Button } from "@/components/ui/button";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { type PostPDFToCloudinary } from "@/interface";
+import { type APIResponse } from "@/interface";
 import { slots, years, campuses, semesters, exams } from "@/components/select_options";
 import SearchBar from "@/components/searchbarSubjectList";
 import Dropzone from "react-dropzone";
@@ -170,7 +170,7 @@ const Page = () => {
 
     try {
       await toast.promise(
-        axios.post<PostPDFToCloudinary>("/api/upload", formData),
+        axios.post<APIResponse>("/api/upload", formData),
         {
           loading: "Uploading papers...",
           success: "Papers uploaded successfully!",
