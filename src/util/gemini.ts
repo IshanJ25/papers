@@ -13,13 +13,6 @@ type AnalysisResult = {
   rawAnalysis: string;
 };
 
-// type MistralResponse = {
-//   choices: Array<{
-//     message: {
-//       content: string;
-//     };
-//   }>;
-// };
 
 // Custom error type
 class ProcessingError extends Error {

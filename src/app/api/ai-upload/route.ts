@@ -71,7 +71,7 @@ export async function POST(req: Request) {
     }
     const tags = await processAndAnalyze({ imageURL });
 
-    // console.log("Final tags:", tags);
+    console.log(" tags:", tags);
 
     const finalTags = await setTagsFromCurrentLists(tags);
     const subject = finalTags["course-name"];

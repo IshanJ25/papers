@@ -120,6 +120,7 @@ const Page = () => {
     if (isPdf && files[0]) {
       formData.append("image", await pdfToImage(files[0]));
     }
+    
     // formData.append("exam", exam);
     formData.append("campus", campus);
 
