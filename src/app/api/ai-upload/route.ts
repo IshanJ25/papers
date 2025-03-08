@@ -226,11 +226,6 @@ async function uploadFile(
 
 async function CreatePDF(orderedFiles: File[]) {
   const pdfDoc = await PDFDocument.create();
-  //sort files using name. Later remove to see if u can without names
-  // moved to main function
-  // const orderedFiles = Array.from(files).sort((a, b) => {
-  //   return a.name.localeCompare(b.name);
-  // });
 
   for (const file of orderedFiles) {
     const fileBlob = new Blob([file]);
