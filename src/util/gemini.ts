@@ -1,7 +1,8 @@
 import '@ungap/with-resolvers';
 
 
-import { Mistral } from "@mistralai/mistralai";
+// import { Mistral } from "@mistralai/mistralai";
+import {GoogleGenerativeAI} from "@google/generative-ai";
 import {type  ExamDetail } from '@/interface';
 
 // Type definitions
@@ -12,13 +13,6 @@ type AnalysisResult = {
   rawAnalysis: string;
 };
 
-type MistralResponse = {
-  choices: Array<{
-    message: {
-      content: string;
-    };
-  }>;
-};
 
 // Custom error type
 class ProcessingError extends Error {
@@ -37,9 +31,10 @@ export default async function processAndAnalyze({
 
   if (imageURL) {
     const analysisResult = await analyzeImage(imageURL);
+    
     return analysisResult[0]?.examDetail;
   } else {
-    throw "Error Creating the Image";
+    throw Error("Error Creating the Image");
   }
 }
 // export async function pdfToImage(file: File) {
@@ -72,20 +67,21 @@ export default async function processAndAnalyze({
 function parseExamDetail(analysis: string): ExamDetail {
   try {
     // Try to find JSON in the response
-    const jsonMatch = analysis.match(/\{[\s\S]*\}/);
+    const jsonRegex = /\{[\s\S]*\}/;
+    const jsonMatch = jsonRegex.exec(analysis);
     if (jsonMatch) {
       const examDetail: ExamDetail = JSON.parse(jsonMatch[0]) as ExamDetail;
       if (examDetail.semester) {
         const validSemesters = ["Fall Semester", "Winter Semester", "Summer Semester", "Weekend Semester"];
         if (!validSemesters.includes(examDetail.semester)) {
-          examDetail.semester = "Fall Semester"; // Default to Fall Semester if invalid
+          examDetail.semester = "Fall Semester"; 
         }
       }
       
       if (examDetail.year) {
         const yearPattern = /^\d{4}$/;
         if (!yearPattern.test(examDetail.year)) {
-          examDetail.year = new Date().getFullYear().toString(); // Default to current year if invalid
+          examDetail.year = new Date().getFullYear().toString(); 
         }
       }
       return examDetail
@@ -95,10 +91,10 @@ function parseExamDetail(analysis: string): ExamDetail {
   } catch (error) {
     console.error("Error parsing exam details:", error);
     return {
-      "course-name": "Unknown",
+      "subject": "Unknown",
       slot: "Unknown",
       "course-code": "Unknown",
-      "exam-type": "Unknown",
+      "exam": "Unknown",
       semester: "Fall Semester",
       year: new Date().getFullYear().toString() 
     };
@@ -108,54 +104,43 @@ function parseExamDetail(analysis: string): ExamDetail {
 // Function to analyze images using Mistral AI
 async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
   try {
-    const apiKey = process.env.MISTRAL_API_KEY;
+    const apiKey = process.env.GEMINI_API_KEY;
     if (!apiKey) {
-      throw new ProcessingError("MISTRAL_API_KEY environment variable not set");
+      throw new ProcessingError("GEMINI_API_KEY environment variable not set");
     }
-    const client = new Mistral({ apiKey });
-
+    
+    const genAI = new GoogleGenerativeAI(apiKey);
+    const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"})
     const results: AnalysisResult[] = [];
 
     // const dataUrl = `data:image/png;base64,${imageBase64}`;
 
-    const prompt = `Please analyze this exam paper image and extract the following details in JSON format:
-    - course-name: The full name of the course (3-4 words, no numbers or special characters)
-    - slot: One of A1|A2|B1|B2|C1|C2|D1|D2|E1|E2|F1|F2|G1|G2
-    - course-code: The course code (format: department letters + numbers)
-    - exam-type: One of "Final Assessment Test|Continuous Assessment Test - 1|Continuous Assessment Test - 2"
-    - semester: Must be exactly one of "Fall Semester", "Winter Semester", "Summer Semester", or "Weekend Semester"
-    - year: The year in YYYY format (e.g., "2023")
-    
-    Provide the response in this exact format:
+    const prompt = `This is an image of a question paper. I want you to extract the Exam name, there can be three: final assessment test, continuous assessment test 1, continuous assessment test 2.Now Final assessment should be labelled as FAT, Continuous assessment 1 should be labelled as CAT-1 and Continuous assessment 2 should be labelled as CAT-2. Also I want you to find me the semester it is from, there can be four: Fall Semester, Winter Semester, Summer Semester, Weekend Semester. Fall semester lasts form july to end of the year and winter from january to May inclusive , summer semester is from june to july. Do not put weekend semester if you dont see it in the image. Also find me the year of the exam and the slot of the exam, they look something like this : A1, A1+TA1, B2+BT2, C1+TC1+TCC1 etc.Instead of the entire slot though i just require the initial, alphaber and number part before the plus sign. And I also require the course title and the course code from the paper. Course code looks something like : BCSE202P, BCSE307L etc. if you unable to find return NOT FOUND also format your output into a .json format. most importantly if you are unsure of anything at all just return NOT FOUND
+
+    make sure to return the output in the following format:
     {
-        "course-name": "...",
-        "slot": "...",
-        "course-code": "...",
-        "exam-type": "...",
-        "semester": "...",
-        "year": "..."
-    }`;
-
-    const chatResponse = (await client.chat.complete({
-      model: "pixtral-12b",
-      messages: [
-        {
-          role: "user",
-          content: [
-            { type: "text", text: prompt },
-            { type: "image_url", imageUrl: dataUrl },
-          ],
-        },
-      ],
-    })) as MistralResponse;
-
-    if (!chatResponse?.choices?.[0]?.message?.content) {
-      throw new ProcessingError("Invalid response from Mistral API");
+    subject: "course title [course code]"
+    exam: "exam type" 
+    year: year
+    slot: "A1/A2/B1 etc "
+    semester: "semester"
     }
+        
+    `;
+    const image = {
+      inlineData: {
+        data: dataUrl,
+        mimeType: "image/png",
+      },
+    };
+    
+    const result = await model.generateContent([prompt, image]);
 
-    const rawAnalysis = chatResponse.choices[0].message.content;
+    const chatResponse = result.response.text();
+    const rawAnalysis =  chatResponse;
+
+    console.log(rawAnalysis)
     const examDetail: ExamDetail = parseExamDetail(rawAnalysis);
-
     results.push({
       examDetail,
       rawAnalysis,
@@ -170,10 +155,10 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
     return [
       {
         examDetail: {
-          "course-name": "Error",
+          "subject": "Error",
           slot: "Error",
           "course-code": "Error",
-          "exam-type": "Error",
+          "exam": "Error",
           semester: "Fall Semester", 
           year: new Date().getFullYear().toString()
         },
@@ -216,7 +201,7 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
 
 // Example usage - Replace with your PDF URL
 // const pdfUrl =
-//   "https://res.cloudinary.com/dtorpaj1c/image/upload/v1731668830/papers/mykcs2yxaman61kx0jvj.pdf";
+//   "https://res.cloudinaGEMINI_API_KEY=AIzaSyBpN6k0jktq4VAbNT4QPoxuEEpDGOnHXSYry.com/dtorpaj1c/image/upload/v1731668830/papers/mykcs2yxaman61kx0jvj.pdf";
 
 // Run the complete process
 // processPDFAndAnalyze(pdfUrl)

@@ -18,8 +18,7 @@ import type {
 } from "@/interface";
 import { PaperAdmin } from "@/db/papers";
 import axios from "axios";
-import processAndAnalyze from "@/util/mistral";
-import { examMap } from "./map";
+import processAndAnalyze from "@/util/gemini";
 import Fuse from "fuse.js";
 // import processAndAnalyze from "./mistral";
 // TODO: REMOVE THUMBNAIL FROM admin-buffer DB
@@ -30,17 +29,34 @@ cloudinary.v2.config({
 });
 type SemesterType = IAdminPaper["semester"]; // Extract the exam type from the IPaper interface
 
+const config1 = {
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_1,
+  api_key: process.env.CLOUDINARY_API_KEY_1,
+  api_secret: process.env.CLOUDINARY_SECRET_1,
+};
+
+const config2 = {
+  cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME_2,
+  api_key: process.env.CLOUDINARY_API_KEY_2,
+  api_secret: process.env.CLOUDINARY_SECRET_2,
+};
+const cloudinaryConfigs = [config1, config2];
+
 export async function POST(req: Request) {
   try {
     if (!process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET) {
       return NextResponse.json({ message: "ServerMisconfig" }, { status: 500 });
     }
+    await connectToDatabase();
+    const count: number = await PaperAdmin.countDocuments();
+    const configIndex = count % cloudinaryConfigs.length;
+    console.log(configIndex)
+    cloudinary.v2.config(cloudinaryConfigs[configIndex]);
+
     const uploadPreset = process.env.NEXT_PUBLIC_CLOUDINARY_UPLOAD_PRESET;
     const formData = await req.formData();
     const files: File[] = formData.getAll("files") as File[];
     const isPdf = formData.get("isPdf") === "true"; // Convert string to boolean
-
-
     let imageURL = "";
     if (isPdf) {
       imageURL = formData.get("image") as string;
@@ -48,16 +64,19 @@ export async function POST(req: Request) {
       const bytes = await files[0]?.arrayBuffer();
       if (bytes) {
         const buffer = Buffer.from(bytes);
-        imageURL = `data:${"image/png"};base64,${buffer.toString("base64")}`;
+        imageURL = buffer.toString("base64"); 
       }
     }
     const tags = await processAndAnalyze({ imageURL });
 
+    console.log(" tags:", tags);
+
     const finalTags = await setTagsFromCurrentLists(tags);
-    console.log("Final tags:", finalTags);
-    const subject = finalTags["course-name"];
+    console.log(" tags:", finalTags);
+
+    const subject = finalTags.subject;
     const slot = finalTags.slot;
-    const exam = finalTags["exam-type"];
+    const exam = finalTags.exam
     const year = finalTags.year;
     const campus = formData.get("campus") as string;
     const semester = finalTags.semester;
@@ -106,7 +125,6 @@ export async function POST(req: Request) {
 
     // If all checks pass, continue with the rest of the logic
 
-    await connectToDatabase();
     let finalUrl: string | undefined = "";
     let public_id_cloudinary: string | undefined = "";
     let thumbnailUrl: string | undefined = "";
@@ -141,7 +159,7 @@ export async function POST(req: Request) {
         uploadPreset,
       );
     }
-
+    console.log(finalUrl)
     const thumbnailResponse = cloudinary.v2.image(finalUrl!, {
       format: "jpg",
     });
@@ -150,7 +168,9 @@ export async function POST(req: Request) {
       .replace("upload", "upload/w_400,h_400,c_fill")
       .replace(/<img src='|'\s*\/>/g, "");
     const paper = new PaperAdmin({
+      cloudinary_index: configIndex,
       public_id_cloudinary,
+  
       finalUrl,
       thumbnailUrl,
       subject,
@@ -201,11 +221,6 @@ async function uploadFile(
 
 async function CreatePDF(orderedFiles: File[]) {
   const pdfDoc = await PDFDocument.create();
-  //sort files using name. Later remove to see if u can without names
-  // moved to main function
-  // const orderedFiles = Array.from(files).sort((a, b) => {
-  //   return a.name.localeCompare(b.name);
-  // });
 
   for (const file of orderedFiles) {
     const fileBlob = new Blob([file]);
@@ -242,41 +257,44 @@ async function setTagsFromCurrentLists(
   );
   const courses = data.map((course: { name: string }) => course.name);
   if (!courses[0] || !slots[0] || !exams[0] || !semesters[0] || !years[0]) {
-    throw "Cannot fetch default value for courses/slot/exam/sem/year!";
+    throw Error("Cannot fetch default value for courses/slot/exam/sem/year!");
   }
 
   const newTags: ExamDetail = {
-    "course-name": courses[0],
+    "subject": courses[0],
     slot: slots[0],
     "course-code": "notInUse",
-    "exam-type": exams[0],
+    "exam": exams[0],
     semester: semesters[0] as SemesterType,
     year: years[0],
   };
+  
   const coursesFuzy = new Fuse(courses);
   if (!tags) {
     console.log("Anaylsis failed setting random courses as fields");
     return newTags;
   } else {
     const subjectSearch = coursesFuzy.search(
-      tags["course-name"] + "|" + tags["course-code"],
+      tags.subject ,
     )[0];
     if (subjectSearch) {
-      newTags["course-name"] = subjectSearch.item;
+      newTags.subject = subjectSearch.item;
     }
     const slotSearchResult = findMatch(slots, tags.slot);
     if (slotSearchResult) {
       newTags.slot = slotSearchResult;
     }
-    if ("exam-type" in tags && tags["exam-type"] in examMap) {
-      const examType = tags["exam-type"] as keyof typeof examMap;
-      newTags["exam-type"] = examMap[examType];
+    const examSearchResult = findMatch(exams, tags.exam);
+    if (examSearchResult) {
+      newTags.exam = examSearchResult;
     }
     const semesterSearchResult = findMatch(semesters, tags.semester);
     if (semesterSearchResult) {
       newTags.semester = semesterSearchResult as SemesterType;
+
     }
     const yearSearchResult = findMatch(years, tags.year);
+
     if (yearSearchResult) {
       newTags.year = yearSearchResult;
     }
