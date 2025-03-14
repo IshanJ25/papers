@@ -1,7 +1,6 @@
 import '@ungap/with-resolvers';
 
 
-// import { Mistral } from "@mistralai/mistralai";
 import {GoogleGenerativeAI} from "@google/generative-ai";
 import {type  ExamDetail } from '@/interface';
 
@@ -101,7 +100,7 @@ function parseExamDetail(analysis: string): ExamDetail {
   }
 }
 
-// Function to analyze images using Mistral AI
+// Function to analyze images using Gemini AI
 async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
   try {
     const apiKey = process.env.GEMINI_API_KEY;
@@ -110,7 +109,7 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
     }
     
     const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({model: "gemini-1.5-flash"})
+    const model = genAI.getGenerativeModel({model: "gemini-2.0-flash"})
     const results: AnalysisResult[] = [];
 
     // const dataUrl = `data:image/png;base64,${imageBase64}`;
