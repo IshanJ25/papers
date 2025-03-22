@@ -7,7 +7,7 @@ import { FilterDialog } from "@/components/FilterDialog";
 import Card from "./Card";
 import { extractBracketContent } from "@/util/utils";
 import { useRouter } from "next/navigation";
-import SearchBar from "./searchbar";
+import SearchBarChild from "./Searchbar/searchbar-child";
 import Loader from "./ui/loader";
 import { campuses, semesters } from "./select_options";
 
@@ -163,9 +163,9 @@ const CatalogueContent = () => {
 
   return (
     <div className="min-h-screen px-2 md:p-8">
-      <div className="mb-10 flex w-full flex-row items-center md:justify-between  md:gap-10">
-        <div className=" w-[120%] md:w-[576px]">
-          <SearchBar />
+      <div className="mb-10 flex w-full flex-row items-center md:justify-between md:gap-10">
+        <div className="w-[120%] md:w-[576px]">
+          <SearchBarChild />
         </div>
         <div className="flex gap-8">
           {subject && filterOptions && (
@@ -181,18 +181,26 @@ const CatalogueContent = () => {
               onApplyFilters={handleApplyFilters}
             />
           )}{" "}
-          <div className=" hidden items-center justify-center gap-2 md:flex md:justify-end 2xl:mr-4">
-            <Button variant="outline" onClick={handleSelectAll} className="font-sans font-semibold border-2 border-black dark:border-[#434dba] hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 dark:hover:border-white">
+          <div className="hidden items-center justify-center gap-2 md:flex md:justify-end 2xl:mr-4">
+            <Button
+              variant="outline"
+              onClick={handleSelectAll}
+              className="border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
+            >
               Select All
             </Button>
-            <Button variant="outline" onClick={handleDeselectAll} className="font-sans font-semibold border-2 border-black dark:border-[#434dba] hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 dark:hover:border-white">
+            <Button
+              variant="outline"
+              onClick={handleDeselectAll}
+              className="border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
+            >
               Deselect All
             </Button>
             <Button
               variant="outline"
               onClick={handleDownloadAll}
               disabled={selectedPapers.length === 0}
-              className="font-sans font-semibold border-2 border-black dark:border-[#434dba] hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 dark:hover:border-white"
+              className="border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
             >
               Download All ({selectedPapers.length})
             </Button>
