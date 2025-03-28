@@ -65,7 +65,7 @@ export interface PaperResponse {
 export interface IAdminPaper {
   public_id_cloudinary: string;
   finalUrl: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string;  
   subject: string;
   slot: string;
   year: string;
