@@ -2,6 +2,7 @@ import { fetchPaperID } from "@/app/actions/get-papers-by-id";
 import Footer from "@/components/Footer";
 import Navbar from "@/components/Navbar";
 import PdfViewer from "@/components/pdfViewer";
+import ShareButton from "@/components/ShareButton";
 import Loader from "@/components/ui/loader";
 import { type ErrorResponse, type PaperResponse } from "@/interface";
 import { extractBracketContent } from "@/util/utils";
@@ -144,7 +145,6 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
       } else {
         return String(err);
       }
-      
     }
   }
   const paper = await getPaper();
@@ -161,11 +161,17 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
         </div>
       ) : (
         <>
-          <h1 className="jost mb-4 text-center text-2xl font-semibold md:mb-10 md:text-3xl">
-            {paper.subject} {paper.exam} {paper.slot} {paper.year}
+          <h1 className="jost mb-4 flex justify-center gap-4 text-center text-2xl font-semibold md:mb-10 md:text-3xl">
+            <div>
+              {paper.subject} {paper.exam} {paper.slot} {paper.year}
+            </div>
+            <ShareButton />
           </h1>
           <center>
-            <PdfViewer url={paper.finalUrl} name={`${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}></PdfViewer>
+            <PdfViewer
+              url={paper.finalUrl}
+              name={`${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}`}
+            ></PdfViewer>
           </center>
         </>
       )}
