@@ -56,19 +56,33 @@ export async function POST(req: Request) {
     const formData = await req.formData();
     const files: File[] = formData.getAll("files") as File[];
     const isPdf = formData.get("isPdf") === "true"; // Convert string to boolean
-    let imageURL = "";
-    if (isPdf) {
-      imageURL = formData.get("image") as string;
-    } else {
-      const bytes = await files[0]?.arrayBuffer();
-      if (bytes) {
-        const buffer = Buffer.from(bytes);
-        imageURL = buffer.toString("base64"); 
-      }
-    }
-    const tags = await processAndAnalyze({ imageURL });
+    // let imageURL = "";
+    // if (isPdf) {
+    //   imageURL = formData.get("image") as string;
+    // } else {
+    //   const bytes = await files[0]?.arrayBuffer();
+    //   if (bytes) {
+    //     const buffer = Buffer.from(bytes);
+    //     imageURL = buffer.toString("base64"); 
+    //   }
+    // }
 
-    console.log(" tags:", tags);
+    let pdfData = "";
+
+    if (isPdf && files.length > 0 && files[0]) {
+      const pdfFile = files[0];
+      const pdfBytes = await pdfFile.arrayBuffer();
+      const pdfBuffer = Buffer.from(pdfBytes);
+      pdfData = pdfBuffer.toString("base64");
+    }
+    else if (files.length > 0) {
+      const pdfBytes = await CreatePDF(files);
+      const pdfBuffer = Buffer.from(pdfBytes);
+      pdfData = pdfBuffer.toString("base64");
+    }
+    const tags = await processAndAnalyze({ pdfData });
+
+    console.log(" tags generated:", tags);
 
     const { data } = await axios.get<ICourses[]>(
       `${process.env.SERVER_URL}/api/course-list`,
@@ -76,7 +90,7 @@ export async function POST(req: Request) {
     const courses = data.map((course: { name: string }) => course.name);
   
     const finalTags = await setTagsFromCurrentLists(tags, courses);
-    console.log(" tags:", finalTags);
+    console.log(" tags final:", finalTags);
 
     const subject = finalTags.subject;
     const slot = finalTags.slot;

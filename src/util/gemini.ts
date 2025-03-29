@@ -1,7 +1,8 @@
 import '@ungap/with-resolvers';
 
 
-import {GoogleGenerativeAI} from "@google/generative-ai";
+// import {GoogleGenerativeAI} from "@google/generative-ai";
+import { GoogleGenAI } from "@google/genai";
 import {type  ExamDetail } from '@/interface';
 
 // Type definitions
@@ -22,20 +23,36 @@ class ProcessingError extends Error {
 }
 
 // Function to ensure output directory exists
+// export default async function processAndAnalyze({
+//   imageURL,
+// }: {
+//   imageURL:string;
+// }) {
+
+//   if (imageURL) {
+//     const analysisResult = await analyzeImage(imageURL);
+    
+//     return analysisResult[0]?.examDetail;
+//   } else {
+//     throw Error("Error Creating the Image");
+//   }
+// }
+
 export default async function processAndAnalyze({
-  imageURL,
+  pdfData,
 }: {
-  imageURL:string;
+  pdfData:string;
 }) {
 
-  if (imageURL) {
-    const analysisResult = await analyzeImage(imageURL);
+  if (pdfData) {
+    const analysisResult = await analyzeImage(pdfData);
     
     return analysisResult[0]?.examDetail;
   } else {
     throw Error("Error Creating the Image");
   }
 }
+
 // export async function pdfToImage(file: File) {
 //   // GlobalWorkerOptions.workerSrc = process.cwd() + '/public/pdf.worker.js'
 //     const bytes = await file.arrayBuffer();
@@ -62,7 +79,7 @@ export default async function processAndAnalyze({
 
 // }
 
-// Function to parse Mistral's response into ExamDetail format
+// Function to parse Gemini's response into ExamDetail format
 function parseExamDetail(analysis: string): ExamDetail {
   try {
     // Try to find JSON in the response
@@ -108,13 +125,9 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
       throw new ProcessingError("GEMINI_API_KEY environment variable not set");
     }
     
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({model: "gemini-2.0-flash"})
     const results: AnalysisResult[] = [];
-
-    // const dataUrl = `data:image/png;base64,${imageBase64}`;
-
-    const prompt = `This is an image of a question paper. I want you to extract the Exam name, there can be three: final assessment test, continuous assessment test 1, continuous assessment test 2.Now Final assessment should be labelled as FAT, Continuous assessment 1 should be labelled as CAT-1 and Continuous assessment 2 should be labelled as CAT-2. Also I want you to find me the semester it is from, there can be four: Fall Semester, Winter Semester, Summer Semester, Weekend Semester. Fall semester lasts form july to end of the year and winter from january to May inclusive , summer semester is from june to july. Do not put weekend semester if you dont see it in the image. Also find me the year of the exam and the slot of the exam, they look something like this : A1, A1+TA1, B2+BT2, C1+TC1+TCC1 etc.Instead of the entire slot though i just require the initial, alphaber and number part before the plus sign. And I also require the course title and the course code from the paper. Course code looks something like : BCSE202P, BCSE307L etc. if you unable to find return NOT FOUND also format your output into a .json format. most importantly if you are unsure of anything at all just return NOT FOUND
+    const ai = new GoogleGenAI({ apiKey });
+    const prompt = `These are images of a question paper. I want you to extract the Exam name, there can be three: final assessment test, continuous assessment test 1, continuous assessment test 2.Now Final assessment should be labelled as FAT, Continuous assessment 1 should be labelled as CAT1 and Continuous assessment 2 should be labelled as CAT2. Also I want you to find me the semester it is from, there can be four: Fall Semester, Winter Semester, Summer Semester, Weekend Semester. Fall semester lasts form july to end of the year and winter from january to May inclusive , summer semester is from june to july. Do not put weekend semester if you dont see it in the image. Also find me the year of the exam and the slot of the exam, they look something like this : A1, A1+TA1, B2+BT2, C1+TC1+TCC1 etc.Instead of the entire slot though i just require the initial, alphaber and number part before the plus sign. And I also require the course title and the course code from the paper. Course code looks something like : BCSE202P, BCSE307L etc. if you unable to find return NOT FOUND also format your output into a .json format. most importantly if you are unsure of anything at all just return NOT FOUND. Also i want you see, if an answerkey is included as well. it may be Handwritten or typed but keep in mind there might be scribbles that are not to be confused as answers. Answer might be written right after the question or at the end of the questions as well. if you find one return answerKeyIncluded as true.
 
     make sure to return the output in the following format:
     {
@@ -123,27 +136,35 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
     year: year
     slot: "A1/A2/B1 etc "
     semester: "semester"
+    answerKeyIncluded: true or false
     }
-        
     `;
-    const image = {
-      inlineData: {
-        data: dataUrl,
-        mimeType: "image/png",
-      },
-    };
-    
-    const result = await model.generateContent([prompt, image]);
+    const contents = [
+      { text: prompt },
+      {
+        inlineData: {
+          mimeType: 'application/pdf',
+          data: dataUrl
+        }
+      }
+    ];
+  
+    const response = await ai.models.generateContent({
+      model: "gemini-2.0-flash",
+      contents: contents
+    });
 
-    const chatResponse = result.response.text();
-    const rawAnalysis =  chatResponse;
+    const rawAnalysis   = response.text;
 
     console.log(rawAnalysis)
-    const examDetail: ExamDetail = parseExamDetail(rawAnalysis);
-    results.push({
-      examDetail,
-      rawAnalysis,
-    });
+
+    if (rawAnalysis) {
+      const examDetail: ExamDetail = parseExamDetail(rawAnalysis);
+      results.push({
+        examDetail,
+        rawAnalysis,
+      });
+    }
 
     return results;
   } catch (error: unknown) {
@@ -166,6 +187,78 @@ async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
     ];
   }
 }
+
+
+
+
+// async function analyzeImage(dataUrl: string): Promise<AnalysisResult[]> {
+//   try {
+//     const apiKey = process.env.GEMINI_API_KEY;
+//     if (!apiKey) {
+//       throw new ProcessingError("GEMINI_API_KEY environment variable not set");
+//     }
+    
+//     const genAI = new GoogleGenerativeAI(apiKey);
+//     const model = genAI.getGenerativeModel({model: "gemini-2.0-flash"})
+//     const results: AnalysisResult[] = [];
+
+//     // const dataUrl = `data:image/png;base64,${imageBase64}`;
+
+//     const prompt = `This is an image of a question paper. I want you to extract the Exam name, there can be three: final assessment test, continuous assessment test 1, continuous assessment test 2.Now Final assessment should be labelled as FAT, Continuous assessment 1 should be labelled as CAT-1 and Continuous assessment 2 should be labelled as CAT-2. Also I want you to find me the semester it is from, there can be four: Fall Semester, Winter Semester, Summer Semester, Weekend Semester. Fall semester lasts form july to end of the year and winter from january to May inclusive , summer semester is from june to july. Do not put weekend semester if you dont see it in the image. Also find me the year of the exam and the slot of the exam, they look something like this : A1, A1+TA1, B2+BT2, C1+TC1+TCC1 etc.Instead of the entire slot though i just require the initial, alphaber and number part before the plus sign. And I also require the course title and the course code from the paper. Course code looks something like : BCSE202P, BCSE307L etc. if you unable to find return NOT FOUND also format your output into a .json format. most importantly if you are unsure of anything at all just return NOT FOUND
+
+//     make sure to return the output in the following format:
+//     {
+//     subject: "course title [course code]"
+//     exam: "exam type" 
+//     year: year
+//     slot: "A1/A2/B1 etc "
+//     semester: "semester"
+//     }
+        
+//     `;
+//     const image = {
+//       inlineData: {
+//         data: dataUrl,
+//         mimeType: "image/png",
+//       },
+//     };
+    
+//     const result = await model.generateContent([prompt, image]);
+
+//     const chatResponse = result.response.text();
+//     const rawAnalysis =  chatResponse;
+
+//     console.log(rawAnalysis)
+//     const examDetail: ExamDetail = parseExamDetail(rawAnalysis);
+//     results.push({
+//       examDetail,
+//       rawAnalysis,
+//     });
+
+//     return results;
+//   } catch (error: unknown) {
+//     const errorMessage =
+//       error instanceof Error ? error.message : "Unknown error occurred";
+//     console.error("Error analyzing images:", errorMessage);
+
+//     return [
+//       {
+//         examDetail: {
+//           "subject": "Error",
+//           slot: "Error",
+//           "course-code": "Error",
+//           "exam": "Error",
+//           semester: "Fall Semester", 
+//           year: new Date().getFullYear().toString()
+//         },
+//         rawAnalysis: `Error analyzing image: ${errorMessage}`,
+//       },
+//     ];
+//   }
+// }
+
+
+
 // Main function to process everything
 // async function processPDFAndAnalyze(pdfUrl: string): Promise<void> {
 //     try {
