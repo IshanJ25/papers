@@ -305,7 +305,7 @@ async function setTagsFromCurrentLists(
     if (yearSearchResult) {
       newTags.year = yearSearchResult;
     }
-    const answerkeySearchResults = findMatch([true, false], tags.answerKeyIncluded?.toString());
+    const answerkeySearchResults = tags.answerKeyIncluded ?? false;
 
     if (yearSearchResult) {
       newTags.answerKeyIncluded = answerkeySearchResults;
