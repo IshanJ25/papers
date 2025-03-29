@@ -40,4 +40,5 @@ const campuses: string[] = [
 ];
 const exams: string [] = ["CAT-1", "CAT-2", "FAT","Model CAT-1" , "Model CAT-2" , "Model FAT"]
 const semesters: string[] = ["Fall Semester", "Winter Semester", "Summer Semester", "Weekend Semester"];
-export { slots, years, campuses, semesters, exams };
+const answerKeyIncluded: boolean[] = [false,true];
+export { slots, years, campuses, semesters, exams, answerKeyIncluded };

@@ -154,6 +154,7 @@ export type ExamDetail = {
   "exam": string;
   semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
   year: string;
+  answerKeyIncluded: boolean | undefined;
 };
 export interface Filters {
   papers: IPaper[];
