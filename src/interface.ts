@@ -65,7 +65,7 @@ export interface PaperResponse {
 export interface IAdminPaper {
   public_id_cloudinary: string;
   finalUrl: string;
-  thumbnailUrl: string;
+  thumbnailUrl: string;  
   subject: string;
   slot: string;
   year: string;
@@ -154,6 +154,7 @@ export type ExamDetail = {
   "exam": string;
   semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
   year: string;
+  answerKeyIncluded: boolean | undefined;
 };
 export interface Filters {
   papers: IPaper[];
