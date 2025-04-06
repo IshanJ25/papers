@@ -27,8 +27,8 @@ export const FilterDialog = ({
   initialExams: string[] | undefined;
   initialSlots: string[] | undefined;
   initialYears: string[] | undefined;
-  initialCampuses: string [] | undefined
-  initialSemesters: string [] | undefined
+  initialCampuses: string[] | undefined;
+  initialSemesters: string[] | undefined;
 
   onReset: () => void;
   onApplyFilters: (exams: string[], slots: string[], years: string[]) => void;
@@ -55,15 +55,15 @@ export const FilterDialog = ({
     setSelectedSlots(initialSlots ?? []);
     setSelectedYears(initialYears ?? []);
     setSelectedCampuses(initialCampuses ?? []);
-    setSelectedSemesters(initialSemesters ?? [])
+    setSelectedSemesters(initialSemesters ?? []);
   }, [initialExams, initialSlots, initialYears]);
 
   const exams = filterOptions.uniqueExams.map((exam) => ({
     label: exam,
     value: exam,
   }));
-  const slots = filterOptions.uniqueSlots.map((slot) => ({
-  label: slot,
+  const slots = filterOptions.uniqueSlots.sort((a, b) => a.localeCompare(b)).map((slot) => ({
+    label: slot,
     value: slot,
   }));
   const years = filterOptions.uniqueYears.map((year) => ({
