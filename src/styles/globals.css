@@ -83,6 +83,8 @@
   }
 }
 
+
+
 @font-face {
   font-family: "phonk";
   src: url(/phonkfont.otf);
@@ -159,4 +161,8 @@
   src: url("/fonts/yerk.woff") format("woff");
   font-weight: 400;
   font-style: normal;
+}
+
+body{
+  position: relative;
 }
