@@ -13,6 +13,10 @@ import SearchBarChild from "./Searchbar/searchbar-child";
 import Loader from "./ui/loader";
 import { campuses, semesters } from "./select_options";
 import SearchBar from "./Searchbar/searchbar";
+import filterIcon from "../assets/filterIcon.svg";
+import Image from "next/image";
+import { XIcon } from "lucide-react";
+import SideBar from "../components/SideBar";
 
 const CatalogueContent = () => {
   const searchParams = useSearchParams();
@@ -34,19 +38,24 @@ const CatalogueContent = () => {
     years,
   );
 
-  const handleResetFilters = () => {
-    setSelectedExams([]);
-    setSelectedSlots([]);
-    setSelectedYears([]);
-    router.push(`/catalogue?subject=${encodeURIComponent(subject!)}`);
-  };
+  // const handleResetFilters = () => {
+  //   setSelectedExams([]);
+  //   setSelectedSlots([]);
+  //   setSelectedYears([]);
+  //   router.push(`/catalogue?subject=${encodeURIComponent(subject!)}`);
+  // };
 
   const [papers, setPapers] = useState<IPaper[]>([]);
   const [selectedPapers, setSelectedPapers] = useState<IPaper[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [filterOptions, setFilterOptions] = useState<Filters>();
+  const [filtersPulled, setFiltersPulled] = useState<boolean>(false);
 
+
+  const closeFilters = ()=>{
+    setFiltersPulled(false)
+  }
   const handleSelectAll = () => setSelectedPapers(papers);
   const handleDeselectAll = () => setSelectedPapers([]);
 
@@ -90,6 +99,7 @@ const CatalogueContent = () => {
         );
       }
       if (exams !== undefined && exams.length > 0) {
+        // console.log(exams);
         pushContent = pushContent.concat(
           `&exams=${encodeURIComponent(exams.join(","))}`,
         );
@@ -106,13 +116,14 @@ const CatalogueContent = () => {
       }
       router.push(pushContent);
     }
-    setSelectedExams(exams);
-    setSelectedSlots(slots);
-    setSelectedYears(years);
+    // setSelectedExams(exams);
+    // setSelectedSlots(slots);
+    // setSelectedYears(years);
     handleDeselectAll();
   };
 
   useEffect(() => {
+
     if (subject) {
       const fetchPapers = async () => {
         setLoading(true);
@@ -162,61 +173,42 @@ const CatalogueContent = () => {
 
       void fetchPapers();
     }
-  }, [subject, searchParams]);
-
+  }, [subject, exams?.join(","), slots?.join(","), years?.join(",")]); //changed because userRouter() changes everytime
   return (
-    <div className="min-h-screen px-2 md:p-8">
-      <div className="mb-10 flex w-full flex-row items-center md:justify-between md:gap-10">
-        <div className="w-[120%] md:w-[576px]">
-          <SearchBar />
-        </div>
-        <div className="flex gap-8">
-          {subject && filterOptions && (
-            <FilterDialog
-              subject={subject}
-              filterOptions={filterOptions}
-              initialExams={exams}
-              initialSlots={slots}
-              initialYears={years}
-              initialCampuses={campuses}
-              initialSemesters={semesters}
-              onReset={handleResetFilters}
-              onApplyFilters={handleApplyFilters}
-            />
-          )}{" "}
-          <div className="hidden items-center justify-center gap-2 md:flex md:justify-end 2xl:mr-4">
-            <Button
-              variant="outline"
-              onClick={handleSelectAll}
-              className="border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
-            >
-              Select All
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDeselectAll}
-              className="border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
-            >
-              Deselect All
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDownloadAll}
-              disabled={selectedPapers.length === 0}
-              className="border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
-            >
-              Download All ({selectedPapers.length})
-            </Button>
-          </div>
-        </div>
-      </div>
+    <div className="relative flex min-h-screen p-0">
+      <SideBar
+        filtersPulled={filtersPulled}
+        handleApplyFilters={handleApplyFilters}
+        handleSelectAll={handleSelectAll}
+        handleDeselectAll={handleDeselectAll}
+        selectedPapers={selectedPapers}
+        subject={subject}
+        filterOptions={filterOptions}
+        handleDownloadAll={handleDownloadAll}
+        closeFilters={closeFilters}
+      />
 
       {error && <p className="text-red-500">{error}</p>}
       {loading ? (
         <Loader />
       ) : papers.length > 0 ? (
         <>
-          <div className="grid grid-cols-4 gap-8">
+          <div className={`grid h-fit grid-cols-1 gap-8 px-[30px] py-[40px] md:grid-cols-4 ${filtersPulled? "blur-xl":""}`}>
+            <div className={`filter md:hidden justify-center ${filtersPulled?"hidden": "flex"}`} >
+              <Button
+                variant="outline"
+                onClick={()=>{setFiltersPulled(true)}}
+                className="mr-2 border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
+              >
+                Add Filters
+                <Image
+                  src={filterIcon as string}
+                  width={30}
+                  height={30}
+                  alt="Filter Icon"
+                />
+              </Button>
+            </div>
             {papers.map((paper) => (
               <Card
                 key={paper._id}

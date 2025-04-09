@@ -4,6 +4,7 @@ import { type ICourses } from "@/interface";
 import SearchBarChild from "./searchbar-child";
 
 async function fetchSubjects() {
+  console.log("search bar wala api call")
   try {
     const response = await axios.get<ICourses[]>(
       `${process.env.SERVER_URL}/api/course-list`,
@@ -18,7 +19,7 @@ async function fetchSubjects() {
 export default async function SearchBar() {
   const subjects = await fetchSubjects();
 
-  console.log("Fetched subjects:", subjects);
+  // console.log("Fetched subjects:", subjects);
 
   return <SearchBarChild initialSubjects={subjects} />;
 }
