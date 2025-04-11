@@ -5,13 +5,13 @@ import Link from "next/link";
 
 const Hero = () => {
   return (
-    <div className="relative" style={{ height: "calc(100vh - 85px)" }}>
+    <div className="tall:h-[85vh] flex flex-between flex-col">
       <h1 className="vipnabd mx-auto my-8 text-center text-3xl font-extrabold">
         Built by Students for Students
       </h1>
       <SearchBar />
       <StoredPapers />
-      <div className="absolute bottom-4 left-1/2 right-1/2 flex flex-col items-center whitespace-nowrap text-center">
+      <div className="mt-2 flex flex-col items-center whitespace-nowrap text-center">
         <h1 className="play text-md">Learn More</h1>
         <Link
           href="#hero"
