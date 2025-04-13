@@ -151,7 +151,7 @@ const CatalogueContent = () => {
     }
   }, [exams, slots, subject, years]);
   return (
-    <div className="relative flex min-h-screen p-0">
+    <div className="relative flex min-h-screen p-0 justify-center md:justify-normal">
       <SideBar
         noAppliedFilters={noAppliedFilters}
         filtersPulled={filtersPulled}
