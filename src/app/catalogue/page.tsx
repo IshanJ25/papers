@@ -6,6 +6,7 @@ import Loader from "@/components/ui/loader";
 const Catalogue = () => {
   return (
     <>
+
       <Suspense fallback={<Loader />}>
         <CatalogueContent />
       </Suspense>
