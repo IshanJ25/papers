@@ -1,10 +1,10 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import SearchBar from "./Searchbar/searchbar";
+import SearchBar, { fetchSubjects } from "./Searchbar/searchbar";
 import { Button } from "./ui/button";
 import Image from "next/image";
-import { XIcon } from "lucide-react";
+import { Search, XIcon } from "lucide-react";
 import filterIcon from "../assets/filterIcon.svg";
 import { type Filters, type IPaper } from "@/interface";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -17,8 +17,10 @@ import {
 import closeIcon from "../assets/close.svg";
 import { set } from "mongoose";
 import toast from "react-hot-toast";
+import SearchbarChild from "./Searchbar/searchbar-child";
 
 function SideBar({
+  loading,
   selectedExams,
   selectedSlots,
   selectedYears,
@@ -36,6 +38,7 @@ function SideBar({
   handleApplyFilters,
   closeFilters,
 }: {
+  loading: boolean;
   selectedExams: string[];
   selectedSlots: string[];
   selectedYears: string[];
@@ -80,11 +83,23 @@ function SideBar({
     label: campus,
     value: campus,
   }));
-
+  const [subjects, setSubjects] = useState<string[]>([]);
+  useEffect(() => {
+    async function fetchSubjectsSidebar() {
+      if(loading)
+      {
+        return;
+      }
+      const fetchedSubjects = await fetchSubjects();
+      setSubjects(fetchedSubjects);
+    }
+    void fetchSubjectsSidebar();
+  }, []);
   return (
     <div
       className={`sticky top-0 mb-0 h-full w-[100em] max-w-xs flex-col items-baseline border-r-2 border-[#36266d] bg-[#f3f5ff] py-[40px] dark:bg-[#070114] md:flex md:w-[30%] ${filtersPulled ? "flex" : "hidden"}`}
     >
+      <SearchbarChild initialSubjects={subjects ?? []}></SearchbarChild>
       <div onClick={closeFilters} className="block md:hidden">
         <Image
           className="absolute right-[10px] top-[10px] w-[7%]"

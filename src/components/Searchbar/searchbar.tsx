@@ -3,7 +3,7 @@ import axios from "axios";
 import { type ICourses } from "@/interface";
 import SearchBarChild from "./searchbar-child";
 
-async function fetchSubjects() {
+export async function fetchSubjects() {
   try {
     console.log("searchbar ")
     const response = await axios.get<ICourses[]>(
