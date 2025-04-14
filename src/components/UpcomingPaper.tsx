@@ -33,7 +33,7 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
 
         router.push(`/catalogue?${queryParams.toString()}`);
       }}
-      className="cursor-pointer rounded-md border-2 border-[#453D60] bg-[#15121c] text-white shadow-lg hover:bg-[#292139]"
+      className="cursor-pointer rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] text-black shadow-lg hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] dark:text-white hover:dark:bg-[#262635]"
     >
       {/* Course Code */}
       <div className="border-b-2 border-[#453D60] p-2">
