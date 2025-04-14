@@ -27,13 +27,13 @@ function Navbar() {
         </Link>
       </div>
       <div className="md:w/[20%] flex items-center justify-end gap-x-2">
-        <div className="hidden md:block">
+        <div className="scale-75 sm:scale-100">
           <ModeToggle />
         </div>
 
         <Link href={pathname == "/upload" ? "/" : "/upload"}>
-          <div className="rounded-md bg-[#453D60] md:p-[2px]">
-            <div className="mt-2 whitespace-nowrap rounded-md bg-slate-200 px-4 py-3 font-sans text-xs font-bold tracking-wider text-black hover:bg-white dark:bg-[#171720] dark:text-white dark:hover:bg-slate-700 md:mt-0 md:px-6 md:text-sm">
+          <div className="rounded-md bg-[#453D60] scale-75  md:p-[2px]">
+          <div className="mt-1 whitespace-nowrap rounded-md bg-slate-200 px-2 py-2 text-[10px] font-bold tracking-tight text-black hover:bg-white dark:bg-[#171720] dark:text-white dark:hover:bg-slate-700 sm:px-4 sm:text-xs md:mt-0 md:px-6 md:text-sm"> 
               {pathname == "/upload" ? "⇱ SEARCH PAPERS" : "⇱ UPLOAD PAPERS"}
             </div>
           </div>

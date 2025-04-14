@@ -132,9 +132,9 @@ const Page = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col justify-between">
-      <div className="2xl:my-15 flex flex-col items-center">
-        <fieldset className="mb-4 w-[350px] rounded-lg border-2 border-gray-300 p-4 pr-8">
+    <div className="flex h-screen flex-col justify-center">
+      <div className="2xl:my-15 flex flex-col items-center ">
+        <fieldset className="mb-4 w-full max-w-md rounded-lg border-2 border-gray-300 pr-8 p-4 ">
           {/* <legend className="text-lg font-bold">Upload papers</legend> */}
 
           <div className="flex w-full flex-col 2xl:gap-y-4">
