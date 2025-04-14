@@ -15,8 +15,16 @@ import {
   AccordionTrigger,
 } from "@/components/ui/accordion";
 import closeIcon from "../assets/close.svg";
+import { set } from "mongoose";
+import toast from "react-hot-toast";
 
 function SideBar({
+  selectedExams,
+  selectedSlots,
+  selectedYears,
+  selectedCampuses,
+  selectedSemesters,
+  selectedAnswerKeyIncluded,
   noAppliedFilters,
   filtersPulled,
   subject,
@@ -28,6 +36,12 @@ function SideBar({
   handleApplyFilters,
   closeFilters,
 }: {
+  selectedExams: string[];
+  selectedSlots: string[];
+  selectedYears: string[];
+  selectedCampuses: string[];
+  selectedSemesters: string[];
+  selectedAnswerKeyIncluded: boolean;
   noAppliedFilters: () => void;
   closeFilters: () => void;
   filtersPulled: boolean;
@@ -46,12 +60,6 @@ function SideBar({
     anskey: boolean,
   ) => void;
 }) {
-  const [selectedExams, setSelectedExams] = useState<string[]>([]);
-  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
-  const [selectedYears, setSelectedYears] = useState<string[]>([]);
-  const [selectedCampuses, setSelectedCampuses] = useState<string[]>([]);
-  const [selectedSemesters, setSelectedSemesters] = useState<string[]>([]);
-  const [answerKey, setAnswerKey] = useState<boolean>(false);
   const exams = filterOptions?.uniqueExams.map((exam) => ({
     label: exam,
     value: exam,
@@ -72,76 +80,6 @@ function SideBar({
     label: campus,
     value: campus,
   }));
-
-  const handleResetFilters = () => {
-    setSelectedExams([]);
-    setSelectedSlots([]);
-    setSelectedYears([]);
-    setSelectedCampuses([]);
-    setSelectedSemesters([]);
-    setAnswerKey(false);
-    noAppliedFilters();
-  };
-  useEffect(() => {
-    handleResetFilters();
-  }, []);
-  function handleXClick<T>(
-    event: React.MouseEvent,
-    mainStuff: T,
-    selectedStuff: T[],
-    setSelectedStuff: React.Dispatch<React.SetStateAction<T[]>>,
-  ) {
-    event.stopPropagation();
-    if (selectedStuff.includes(mainStuff)) {
-      setSelectedStuff(
-        selectedStuff.filter((el) => {
-          return el != mainStuff;
-        }),
-      );
-    }
-  }
-
-  function handleFilterClick<T>(
-    event: React.MouseEvent,
-    mainstuff: T,
-    selectedStuff: T[],
-    setSelectedStuff: React.Dispatch<React.SetStateAction<T[]>>,
-  ) {
-    event.stopPropagation();
-    if (!selectedStuff.includes(mainstuff)) {
-      setSelectedStuff((prevItems) => [...prevItems, mainstuff]);
-    }
-  }
-  useEffect(() => {
-    //this is to check if any of the filters is clicked and if clicked then apply the filter without using the applyfilter button
-    if (
-      selectedExams.length > 0 ||
-      selectedSlots.length > 0 ||
-      selectedYears.length > 0 ||
-      selectedCampuses.length > 0 ||
-      selectedSemesters.length > 0 ||
-      answerKey === true
-    )
-      handleApplyFilters(
-        selectedExams,
-        selectedSlots,
-        selectedYears,
-        selectedCampuses,
-        selectedSemesters,
-        answerKey,
-      );
-    else {
-      noAppliedFilters();
-    }
-  }, [
-    //dont listen to eslint here if ya dont want to have an infinite loop
-    selectedExams,
-    selectedSlots,
-    selectedYears,
-    selectedCampuses,
-    selectedSemesters,
-    answerKey,
-  ]);
 
   return (
     <div
@@ -199,7 +137,9 @@ function SideBar({
         <div className="flex flex-col">
           <div
             className="cursor-pointer rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
-            onClick={handleResetFilters}
+            onClick={() => {
+              handleApplyFilters([], [], [], [], [], false);
+            }}
           >
             Reset Filters
           </div>
@@ -208,67 +148,57 @@ function SideBar({
       <div className="flex w-full items-center justify-between border-b-2 border-[#36266d] px-[10px] py-4">
         <div
           onClick={() => {
-            setAnswerKey(true);
+            handleApplyFilters(
+              selectedExams,
+              selectedSlots,
+              selectedYears,
+              selectedCampuses,
+              selectedSemesters,
+              !selectedAnswerKeyIncluded,
+            );
           }}
-          className={`flex cursor-pointer rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white ${answerKey ? "dark:border-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba] dark:bg-[#434dba] bg-[#B2B8FF]  border-[#B2B8FF] hover:bg-[#B2B8FF] hover:border-black" : "dark:border-white dark:hover:border-[#434dba] hover:bg-[#B2B8FF] bg-none"}`}
+          className={`flex cursor-pointer rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white ${selectedAnswerKeyIncluded ? "border-[#B2B8FF] bg-[#B2B8FF] hover:border-black hover:bg-[#B2B8FF] dark:border-[#434dba] dark:bg-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba]" : "bg-none hover:bg-[#B2B8FF] dark:border-white dark:hover:border-[#434dba]"}`}
         >
           Answer Key Available
-          {answerKey && (
-            <XIcon
-              className="h-4 cursor-pointer text-muted-foreground"
-              onClick={(event) => {
-                event.stopPropagation();
-                setAnswerKey(false);
-              }}
-            />
-          )}
         </div>
       </div>
       <div className="flex w-full flex-col items-baseline justify-between border-b-2 border-[#36266d] px-[10px]">
-        <Accordion
-          className="w-full"
-          type="single"
-          collapsible
-          defaultValue="item-1"
-        >
+        <Accordion className="w-full" type="single" collapsible>
           <AccordionItem className="border-none no-underline" value="item-1">
             <AccordionTrigger className="w-full no-underline">
               <div className="font-sans text-sm no-underline">Exams</div>
             </AccordionTrigger>
             <AccordionContent>
               <div className="my-2 flex w-full flex-wrap items-center">
-                {exams?.map((exam) => {
-                  return (
-                    <>
-                      <div
-                        onClick={(event) => {
-                          handleFilterClick(
-                            event,
-                            exam.value,
-                            selectedExams,
-                            setSelectedExams,
-                          );
-                        }}
-                        className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedExams.includes(exam.value) ? "dark:border-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba] dark:bg-[#434dba] bg-[#B2B8FF]  border-[#B2B8FF] hover:bg-[#B2B8FF] hover:border-black" : "dark:border-white dark:hover:border-[#434dba] hover:bg-[#B2B8FF] bg-none"}`}
-                      >
-                        {exam.label}
-                        {selectedExams.includes(exam.value) && (
-                          <XIcon
-                            className="h-4 cursor-pointer text-muted-foreground"
-                            onClick={(event) => {
-                              handleXClick(
-                                event,
-                                exam.value,
-                                selectedExams,
-                                setSelectedExams,
-                              );
-                            }}
-                          />
-                        )}
-                      </div>
-                    </>
-                  );
-                })}
+                {exams?.map((exam) => (
+                  <div
+                    key={exam.value}
+                    onClick={() => {
+                      if (selectedExams.includes(exam.value)) {
+                        handleApplyFilters(
+                          selectedExams.filter((e) => e !== exam.value),
+                          selectedSlots,
+                          selectedYears,
+                          selectedCampuses,
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      } else {
+                        handleApplyFilters(
+                          [...selectedExams, exam.value],
+                          selectedSlots,
+                          selectedYears,
+                          selectedCampuses,
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      }
+                    }}
+                    className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedExams.includes(exam.value) ? "border-[#B2B8FF] bg-[#B2B8FF] hover:border-black hover:bg-[#B2B8FF] dark:border-[#434dba] dark:bg-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba]" : "bg-none hover:bg-[#B2B8FF] dark:border-white dark:hover:border-[#434dba]"}`}
+                  >
+                    {exam.label}
+                  </div>
+                ))}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -282,38 +212,35 @@ function SideBar({
             </AccordionTrigger>
             <AccordionContent>
               <div className="my-2 flex w-full flex-wrap items-center">
-                {slots?.map((slot) => {
-                  return (
-                    <>
-                      <div
-                        onClick={(event) => {
-                          handleFilterClick(
-                            event,
-                            slot.value,
-                            selectedSlots,
-                            setSelectedSlots,
-                          );
-                        }}
-                        className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedSlots.includes(slot.value) ? "dark:border-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba] dark:bg-[#434dba] bg-[#B2B8FF]  border-[#B2B8FF] hover:bg-[#B2B8FF] hover:border-black" : "dark:border-white dark:hover:border-[#434dba] hover:bg-[#B2B8FF] bg-none"}`}
-                      >
-                        {slot.label}
-                        {selectedSlots.includes(slot.value) && (
-                          <XIcon
-                            className="h-4 cursor-pointer text-muted-foreground"
-                            onClick={(event) => {
-                              handleXClick(
-                                event,
-                                slot.value,
-                                selectedSlots,
-                                setSelectedSlots,
-                              );
-                            }}
-                          />
-                        )}
-                      </div>
-                    </>
-                  );
-                })}
+                {slots?.map((slot) => (
+                  <div
+                    key={slot.value}
+                    onClick={() => {
+                      if (selectedSlots.includes(slot.value)) {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots.filter((s) => s !== slot.value),
+                          selectedYears,
+                          selectedCampuses,
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      } else {
+                        handleApplyFilters(
+                          selectedExams,
+                          [...selectedSlots, slot.value],
+                          selectedYears,
+                          selectedCampuses,
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      }
+                    }}
+                    className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedSlots.includes(slot.value) ? "border-[#B2B8FF] bg-[#B2B8FF] hover:border-black hover:bg-[#B2B8FF] dark:border-[#434dba] dark:bg-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba]" : "bg-none hover:bg-[#B2B8FF] dark:border-white dark:hover:border-[#434dba]"}`}
+                  >
+                    {slot.label}
+                  </div>
+                ))}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -327,38 +254,35 @@ function SideBar({
             </AccordionTrigger>
             <AccordionContent>
               <div className="my-2 flex w-full flex-wrap items-center">
-                {years?.map((year) => {
-                  return (
-                    <>
-                      <div
-                        onClick={(event) => {
-                          handleFilterClick(
-                            event,
-                            year.value,
-                            selectedYears,
-                            setSelectedYears,
-                          );
-                        }}
-                        className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedYears.includes(year.value) ? "dark:border-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba] dark:bg-[#434dba] bg-[#B2B8FF]  border-[#B2B8FF] hover:bg-[#B2B8FF] hover:border-black" : "dark:border-white dark:hover:border-[#434dba] hover:bg-[#B2B8FF] bg-none"}`}
-                      >
-                        {year.label}
-                        {selectedYears.includes(year.value) && (
-                          <XIcon
-                            className="h-4 cursor-pointer text-muted-foreground"
-                            onClick={(event) => {
-                              handleXClick(
-                                event,
-                                year.value,
-                                selectedYears,
-                                setSelectedYears,
-                              );
-                            }}
-                          />
-                        )}
-                      </div>
-                    </>
-                  );
-                })}
+                {years?.map((year) => (
+                  <div
+                    key={year.value}
+                    onClick={() => {
+                      if (selectedYears.includes(year.value)) {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          selectedYears.filter((y) => y !== year.value),
+                          selectedCampuses,
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      } else {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          [...selectedYears, year.value],
+                          selectedCampuses,
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      }
+                    }}
+                    className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedYears.includes(year.value) ? "border-[#B2B8FF] bg-[#B2B8FF] hover:border-black hover:bg-[#B2B8FF] dark:border-[#434dba] dark:bg-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba]" : "bg-none hover:bg-[#B2B8FF] dark:border-white dark:hover:border-[#434dba]"}`}
+                  >
+                    {year.label}
+                  </div>
+                ))}
               </div>
             </AccordionContent>
           </AccordionItem>
@@ -372,44 +296,41 @@ function SideBar({
             </AccordionTrigger>
             <AccordionContent>
               <div className="my-2 flex w-full flex-wrap items-center">
-                {semesters?.map((semester) => {
-                  return (
-                    <>
-                      <div
-                        onClick={(event) => {
-                          handleFilterClick(
-                            event,
-                            semester.value,
-                            selectedSemesters,
-                            setSelectedSemesters,
-                          );
-                        }}
-                        className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedSemesters.includes(semester.value) ? "dark:border-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba] dark:bg-[#434dba] bg-[#B2B8FF]  border-[#B2B8FF] hover:bg-[#B2B8FF] hover:border-black" : "dark:border-white dark:hover:border-[#434dba] hover:bg-[#B2B8FF] bg-none"}`}
-                      >
-                        {semester.label}
-                        {selectedSemesters.includes(semester.value) && (
-                          <XIcon
-                            className="h-4 cursor-pointer text-muted-foreground"
-                            onClick={(event) => {
-                              handleXClick(
-                                event,
-                                semester.value,
-                                selectedSemesters,
-                                setSelectedSemesters,
-                              );
-                            }}
-                          />
-                        )}
-                      </div>
-                    </>
-                  );
-                })}
+                {semesters?.map((semester) => (
+                  <div
+                    key={semester.value}
+                    onClick={() => {
+                      if (selectedSemesters.includes(semester.value)) {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          selectedYears,
+                          selectedCampuses,
+                          selectedSemesters.filter((s) => s !== semester.value),
+                          selectedAnswerKeyIncluded,
+                        );
+                      } else {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          selectedYears,
+                          selectedCampuses,
+                          [...selectedSemesters, semester.value],
+                          selectedAnswerKeyIncluded,
+                        );
+                      }
+                    }}
+                    className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedSemesters.includes(semester.value) ? "border-[#B2B8FF] bg-[#B2B8FF] hover:border-black hover:bg-[#B2B8FF] dark:border-[#434dba] dark:bg-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba]" : "bg-none hover:bg-[#B2B8FF] dark:border-white dark:hover:border-[#434dba]"}`}
+                  >
+                    {semester.label}
+                  </div>
+                ))}
               </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
       </div>
-      <div className="flex w-full flex-col items-baseline justify-between border-b-2 border-[#36266d] px-[10px]">
+      {/* <div className="flex w-full flex-col items-baseline justify-between border-b-2 border-[#36266d] px-[10px]">
         <Accordion className="w-full" type="single" collapsible>
           <AccordionItem className="border-none no-underline" value="item-1">
             <AccordionTrigger className="w-full no-underline">
@@ -417,43 +338,40 @@ function SideBar({
             </AccordionTrigger>
             <AccordionContent>
               <div className="my-2 flex w-full flex-wrap items-center">
-                {campuses?.map((campus) => {
-                  return (
-                    <>
-                      <div
-                        onClick={(event) => {
-                          handleFilterClick(
-                            event,
-                            campus.value,
-                            selectedCampuses,
-                            setSelectedCampuses,
-                          );
-                        }}
-                        className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedCampuses.includes(campus.value) ? "dark:border-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba] dark:bg-[#434dba] bg-[#B2B8FF]  border-[#B2B8FF] hover:bg-[#B2B8FF] hover:border-black" : "dark:border-white dark:hover:border-[#434dba] hover:bg-[#B2B8FF] bg-none"}`}
-                      >
-                        {campus.label}
-                        {selectedCampuses.includes(campus.value) && (
-                          <XIcon
-                            className="h-4 cursor-pointer text-muted-foreground"
-                            onClick={(event) => {
-                              handleXClick(
-                                event,
-                                campus.value,
-                                selectedCampuses,
-                                setSelectedCampuses,
-                              );
-                            }}
-                          />
-                        )}
-                      </div>
-                    </>
-                  );
-                })}
+                {campuses?.map((campus) => (
+                  <div
+                    key={campus.value}
+                    onClick={() => {
+                      if (selectedCampuses.includes(campus.value)) {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          selectedYears,
+                          selectedCampuses.filter((c) => c !== campus.value),
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      } else {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          selectedYears,
+                          [...selectedCampuses, campus.value],
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      }
+                    }}
+                    className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedCampuses.includes(campus.value) ? "border-[#B2B8FF] bg-[#B2B8FF] hover:border-black hover:bg-[#B2B8FF] dark:border-[#434dba] dark:bg-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba]" : "bg-none hover:bg-[#B2B8FF] dark:border-white dark:hover:border-[#434dba]"}`}
+                  >
+                    {campus.label}
+                  </div>
+                ))}
               </div>
             </AccordionContent>
           </AccordionItem>
         </Accordion>
-      </div>
+      </div> */}
     </div>
   );
 }

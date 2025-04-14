@@ -11,7 +11,7 @@ import toast from "react-hot-toast";
 
 interface PaperCardProps {
   subject: string;
-  slots: string []; // Single slot value, split into buttons if needed
+  slots: string[]; // Single slot value, split into buttons if needed
 }
 
 export default function PaperCard({ subject, slots }: PaperCardProps) {
@@ -25,13 +25,19 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
     <div
       onClick={(e) => {
         e.preventDefault();
-        router.push(`/catalogue?subject=${encodeURIComponent(subject)}`);
+        const slotQuery = slots.join(",");
+        const queryParams = new URLSearchParams({
+          subject,
+          slots: slotQuery,
+        });
+
+        router.push(`/catalogue?${queryParams.toString()}`);
       }}
       className="cursor-pointer rounded-md border-2 border-[#453D60] bg-[#15121c] text-white shadow-lg hover:bg-[#292139]"
     >
       {/* Course Code */}
       <div className="border-b-2 border-[#453D60] p-2">
-        <h3 className="inline-block vipnabd rounded-t-lg px-2 py-1 text-lg">
+        <h3 className="vipnabd inline-block rounded-t-lg px-2 py-1 text-lg">
           {courseCode} {/* Replace with dynamic code if needed */}
         </h3>
       </div>
