@@ -41,7 +41,7 @@ const CatalogueContent = () => {
   const [filteredPapers, setFilteredPapers] = useState<IPaper[]>([]);
   const [selectedPapers, setSelectedPapers] = useState<IPaper[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filterOptions, setFilterOptions] = useState<Filters>();
   const [filtersPulled, setFiltersPulled] = useState<boolean>(false);
   const [appliedFilters, setAppliedFilters] = useState<boolean>(false);
@@ -59,6 +59,7 @@ const CatalogueContent = () => {
         const data: Filters = papersResponse.data;
         const papersData = data.papers;
         setFilterOptions(data);
+        setPapers(papersData);
 
         const filtered = papersData.filter((paper) => {
           const examCondition = selectedExams.length
@@ -88,8 +89,7 @@ const CatalogueContent = () => {
             answerkeyCondition
           );
         });
-
-        setPapers(filtered.length > 0 ? filtered : papersData);
+        setFilteredPapers(filtered.length > 0 ? filtered : papersData);
       } catch (error) {
         if (axios.isAxiosError(error)) {
           const axiosError = error as AxiosError<{ message?: string }>;
@@ -213,6 +213,7 @@ const CatalogueContent = () => {
   return (
     <div className="relative flex min-h-screen justify-center p-0 md:justify-normal">
       <SideBar
+        loading={loading}
         selectedExams={selectedExams}
         selectedSlots={selectedSlots}
         selectedYears={selectedYears}
