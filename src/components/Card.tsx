@@ -65,7 +65,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
     <div
       className={cn(
         "play overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
-        checked && "bg-[#262635]",
+        checked && "bg-white",
       )}
     >
       <Link href={paperLink} target="_blank" rel="noopener noreferrer">
@@ -86,7 +86,15 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
               <Link href={paperLink} target="_blank" rel="noopener noreferrer">
                 <Eye size={22} />
               </Link>
-              <Download size={20} onClick={() => handleDownload(paper)} />
+              <Download
+                size={20}
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleDownload(paper);
+                }}
+                className="cursor-pointer"
+              />
             </div>
           </div>
 
