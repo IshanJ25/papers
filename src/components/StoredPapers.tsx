@@ -34,7 +34,7 @@ function StoredPapers() {
         Upcoming Papers
       </p>
 
-      <div className="grid grid-cols-1 justify-center gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 justify-center gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 px-6">
         {displayPapers.map((paper: IUpcomingPaper) => (
           <UpcomingPaper
             key={paper.subject}
