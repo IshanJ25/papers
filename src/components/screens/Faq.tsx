@@ -18,10 +18,10 @@ function Faq() {
 
   return (
     <>
-      <div id="faq" className="mb-8 w-full text-center text-4xl font-bold text-[#120020] dark:text-white lg:text-left lg:text-5xl vipnabd">
+      <div id="faq" className="mb-8 w-full text-center text-4xl font-bold text-[#120020] dark:text-white lg:text-left lg:text-5xl vipnabd px-6">
         Frequently Asked Questions
       </div>
-      <div className="play mx-auto w-full space-y-6">
+      <div className="play mx-auto w-full space-y-6 px-6">
         {faqs.map((faq, index) => (
           <div
             key={index}
