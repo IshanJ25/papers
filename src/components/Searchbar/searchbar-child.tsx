@@ -9,15 +9,13 @@ function SearchBarChild({ initialSubjects }: { initialSubjects: string[] }) {
   const router = useRouter();
   const [searchText, setSearchText] = useState("");
   const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [subjects] = useState<string[]>(initialSubjects);
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
-
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setSearchText(text);
-
-    if (text.length > 1 && subjects.length > 0) {
-      const filteredSuggestions = subjects.filter((subject) =>
+    
+    if (text.length > 1 && initialSubjects.length > 0) {
+      const filteredSuggestions = initialSubjects.filter((subject) =>
         subject.toLowerCase().includes(text.toLowerCase()),
       );
       setSuggestions(filteredSuggestions);
@@ -73,7 +71,7 @@ function SearchBarChild({ initialSubjects }: { initialSubjects: string[] }) {
             <Search className="h-5 w-5 text-black dark:text-white" />
           </button>
           {(suggestions.length > 0 ||
-            (searchText.length > 1 && subjects.length > 0)) && (
+            (searchText.length > 1 && initialSubjects.length > 0)) && (
             <ul
               ref={suggestionsRef}
               className="absolute z-20 h-[250px] w-full max-w-xl overflow-y-scroll rounded-md rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771] md:mx-0 md:h-auto md:overflow-auto"
