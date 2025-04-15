@@ -94,11 +94,14 @@ function SideBar({
       setSubjects(fetchedSubjects);
     }
     void fetchSubjectsSidebar();
-  }, []);
+    
+  }, [loading]);
   return (
     <div
       className={`no-scrollbar overflow-y-scroll sticky top-0 mb-0 h-[100vh] w-[100em] max-w-xs flex-col items-baseline border-r-2 border-[#36266d] bg-[#f3f5ff] py-[40px] dark:bg-[#070114] md:flex md:w-[30%] ${filtersPulled ? "flex" : "hidden"}`}
     >
+
+
       <div onClick={closeFilters} className="block md:hidden">
         <Image
           className="absolute right-[10px] top-[10px] w-[7%]"
