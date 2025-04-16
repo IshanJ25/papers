@@ -13,6 +13,7 @@ import filterIcon from "../assets/filterIcon.svg";
 import Image from "next/image";
 import SideBar from "../components/SideBar";
 import toast from "react-hot-toast";
+import Error from "./Error";
 
 const CatalogueContent = () => {
   const router = useRouter();
@@ -232,7 +233,7 @@ const CatalogueContent = () => {
         closeFilters={closeFilters}
       />
 
-      {error && <p className="text-red-500">{error}</p>}
+      {/* {error && <p className="text-red-500">{error}</p>} */}
       {loading ? (
         <Loader />
       ) : papers.length > 0 ? (
@@ -282,7 +283,9 @@ const CatalogueContent = () => {
           )}
         </div>
       ) : (
-        <p>No papers available for this subject.</p>
+        <Error 
+          message={error ?? "No papers available for this subject."}
+        />
       )}
     </div>
   );
