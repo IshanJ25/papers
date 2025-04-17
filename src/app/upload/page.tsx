@@ -132,9 +132,9 @@ const Page = () => {
   };
 
   return (
-    <div className="flex h-screen flex-col justify-center play">
-      <div className="2xl:my-15 flex flex-col items-center ">
-        <fieldset className="mb-4 w-full max-w-md rounded-lg border-2 border-gray-300 pr-8 p-4 ">
+    <div className="play flex h-screen flex-col justify-center">
+      <div className="2xl:my-15 flex flex-col items-center">
+        <fieldset className="mb-4 w-full max-w-md rounded-lg border-2 border-gray-300 p-4 pr-8">
           {/* <legend className="text-lg font-bold">Upload papers</legend> */}
 
           <div className="flex w-full flex-col 2xl:gap-y-4">
@@ -142,23 +142,24 @@ const Page = () => {
             <div>
               <Dropzone onDrop={fileCheckAndSelect}>
                 {({ getRootProps, getInputProps }) => (
-                  <section {...getRootProps()} className="my-2 -mr-2 cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center">
-                  <div >
-                    <input {...getInputProps()} />
-                    <p>
-                      Drag &apos;n&apos; drop some files here, or{" "}
-                      <span className="text-[#6D28D9]">click</span> to select
-                      files
-                    </p>
-                  <div
-                    className={`mt-2 text-xs ${
-                      files?.length === 0 ? "text-red-500" : "text-gray-600"
-                    }`}
+                  <section
+                    {...getRootProps()}
+                    className="my-2 -mr-2 cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center"
                   >
-                    {files?.length || 0} files selected
-                  </div>
-                  </div>
-                </section>
+                      <input {...getInputProps()} />
+                      <p>
+                        Drag &apos;n&apos; drop some files here, or{" "}
+                        <span className="text-[#6D28D9]">click</span> to select
+                        files
+                      </p>
+                      <div
+                        className={`mt-2 text-xs ${
+                          files?.length === 0 ? "text-red-500" : "text-gray-600"
+                        }`}
+                      >
+                        {files?.length || 0} files selected
+                      </div>
+                  </section>
                 )}
               </Dropzone>
               <label className="mx-2 -mr-2 block text-center text-xs font-medium text-gray-700">
@@ -171,7 +172,7 @@ const Page = () => {
         <Button
           onClick={handlePrint}
           disabled={isUploading}
-          className={`w-fit rounded-md px-4 text-xl py-3 ${isUploading ? "bg-gray-300" : ""}`}
+          className={`w-fit rounded-md px-4 py-3 text-xl ${isUploading ? "bg-gray-300" : ""}`}
         >
           {isUploading ? "Uploading..." : "Upload Papers"}
         </Button>

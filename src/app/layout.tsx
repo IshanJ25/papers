@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   title: "Papers by CodeChef-VIT | Explore VIT Previous Year Question Papers",
   description:
     "Discover previous year question papers created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.",
-  icons: [{ rel: "icon", url: "/codechef_logo.svg" }],
+  icons: [{ rel: "icon", url: "/favicon.svg" }],
   openGraph: {
     title: "Papers by CodeChef-VIT | Exam Resources",
     images: [{ url: "/papers.png" }],
