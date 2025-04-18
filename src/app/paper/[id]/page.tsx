@@ -165,7 +165,6 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
             <div>
               {paper.subject} {paper.exam} {paper.slot} {paper.year}
             </div>
-            <ShareButton />
           </h1>
           <center>
             <PdfViewer

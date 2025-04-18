@@ -60,7 +60,7 @@ function StoredPapers() {
     return <Loader prop="m-10" />;
   }
 
-  const plugins = [Autoplay({ delay: 3000, stopOnInteraction: true })];
+  const plugins = [Autoplay({ delay: 5000, stopOnInteraction: true })];
 
   return (
     <div className="px-4">
