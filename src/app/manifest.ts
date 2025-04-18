@@ -17,6 +17,27 @@ export default function manifest(): MetadataRoute.Manifest {
     display: "standalone",
     background_color: "#070114",
     theme_color: "#070114",
+    categories: [
+      "education",
+      "reference",
+      "productivity",
+      "technology"
+    ],
+    "shortcuts": [
+      {
+        "name": "Upload",
+        "short_name": "Upload",
+        "description": "Upload a paper",
+        "url": "/upload",
+        "icons": [
+          {
+            "src": "/icons/icon-192x192.webp",
+            "sizes": "192x192",
+            "type": "image/webp"
+          }
+        ]
+      },
+    ],
     icons: [
       { src: "/icons/icon-192x192.webp", sizes: "192x192", type: "image/webp", purpose: "maskable" },
       { src: "/icons/icon-196x196.webp", sizes: "196x196", type: "image/webp" },
