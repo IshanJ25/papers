@@ -8,6 +8,8 @@ import { Button } from "./ui/button";
 import { extractBracketContent } from "@/util/utils";
 import { downloadFile } from "./CatalogueContent";
 import ShareButton from "./ShareButton";
+import Loader from "./ui/loader";
+import { FaGreaterThan, FaLessThan } from "react-icons/fa6";
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -73,7 +75,11 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
           error={
             <div className="p-4 text-red-500">Failed to load PDF file.</div>
           }
-          loading={<div className="p-4 text-gray-500">Loading PDF...</div>}
+          loading={
+            <div className="p-4 text-gray-500">
+              <Loader />
+            </div>
+          }
           noData={
             <div className="p-4 text-gray-500">No PDF file specified.</div>
           }
@@ -92,14 +98,16 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
       <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#262635] p-4 shadow sm:flex-row">
         {/* Page Navigation */}
         <ShareButton />
-        <Button onClick={downloadPDF}><Download/></Button>
+        <Button onClick={downloadPDF} className="aspect-square h-10 w-10 p-0">
+          <Download />
+        </Button>
         <div className="flex items-center gap-2">
           <Button
             onClick={goToPreviousPage}
             disabled={pageNumber <= 1}
-            className="rounded  px-3 py-1 disabled:opacity-50 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
+            className="h-10 w-10 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a] disabled:opacity-50"
           >
-            {"<"}
+            <FaLessThan />
           </Button>
           <input
             type="number"
@@ -107,15 +115,15 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
             onChange={handlePageChange}
             min={1}
             max={numPages}
-            className="w-16 rounded border p-1 text-center"
+            className="h-10 w-16 rounded border p-1 text-center"
           />
           <span>of {numPages ?? 1}</span>
           <Button
             onClick={goToNextPage}
             disabled={pageNumber >= (numPages ?? 1)}
-            className="rounded  disabled:opacity-50 px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
+            className="h-10 w-10 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a] disabled:opacity-50"
           >
-            {">"}
+            <FaGreaterThan />
           </Button>
         </div>
 
@@ -124,7 +132,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
           <Button
             onClick={zoomOut}
             disabled={scale <= 0.25}
-            className="rounded  px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
+            className="h-10 w-10 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
           >
             <ZoomOut />
           </Button>
@@ -132,15 +140,12 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
           <Button
             onClick={zoomIn}
             disabled={scale >= 3}
-            className="rounded  px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
+            className="h-10 w-10 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
           >
             {<ZoomIn />}
           </Button>
         </div>
       </div>
-
-      {/* Document Name */}
-      <p className="mt-2 text-gray-700">Viewing: {name}</p>
     </div>
   );
 }

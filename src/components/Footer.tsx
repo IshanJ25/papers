@@ -16,6 +16,7 @@ import {
   FaXTwitter,
   FaYoutube,
 } from "react-icons/fa6";
+import { Mail } from "lucide-react";
 
 export default function Footer() {
   const { theme } = useTheme();
@@ -30,7 +31,7 @@ export default function Footer() {
   return (
     <footer className="w-full overflow-hidden bg-gradient-to-b from-[#F3F5FF] to-[#A599CE] px-12 py-12 font-sans text-white dark:from-[#070114] dark:to-[#1F0234]">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-y-4 lg:flex-row lg:justify-between">
-        <div className="flex flex-col gap-4 lg:items-start lg:text-left">
+        <div className="flex flex-col gap-4 md:items-start lg:text-left">
           <h1 className="jost mb-5 bg-gradient-to-r from-[#562EE7] to-[rgba(116,128,255,0.8)] bg-clip-text text-left text-7xl font-bold tracking-wide text-transparent dark:from-[#562EE7] dark:to-[#FFC6E8]">
             Papers
           </h1>
@@ -78,26 +79,29 @@ export default function Footer() {
             </Link>
           </div>
         </div>
-        {/* <div className="flex flex-col items-center gap-2 text-center text-black dark:text-white lg:items-start lg:text-left">
-          <h3 className="jost text-2xl font-semibold">Menu</h3>
-          <Link href="/#search">Search</Link>
-          <Link href="/#features">Features</Link>
-          <Link href="/#faq">FAQ</Link>
-        </div> */}
-        {/* <div className="flex flex-col items-center gap-2 text-center text-black dark:text-white lg:items-start lg:text-left">
+        <div className="flex flex-col gap-2 text-black dark:text-white md:items-start lg:text-left">
+          <h3 className="jost text-2xl font-semibold">Events</h3>
+          <Link href="https://devsoc25.codechefvit.com">DevSOC</Link>
+          <Link href="https://gravitas.codechefvit.com">CookOff</Link>
+          <Link href="https://gravitas.codechefvit.com">Clueminati</Link>
+        </div>
+        <div className="flex flex-col gap-2 text-black dark:text-white md:items-start lg:text-left">
           <h3 className="jost text-2xl font-semibold">Our Projects</h3>
-          <Link href="/">Papers</Link>
-          <Link href="/">FFCS-inator</Link>
-          <Link href="/">Brainrot Arcade</Link>
-        </div> */}
-        <div className="flex flex-col gap-2 text-black dark:text-white lg:items-start lg:text-left">
+          <Link href="https://papers.codechefvit.com">Papers</Link>
+          <Link href="https://contactify.codechefvit.com">Contactify</Link>
+          <Link href="https://ffcs.codechefvit.com">FFCS Combogen</Link>
+        </div>
+        <div className="flex flex-col gap-2 text-black dark:text-white md:items-start lg:text-left">
           <h3 className="jost text-2xl font-semibold">Contact Us</h3>
-          <Link href={`mailto:codechefvit@gmail.com`}>
-            codechefvit@gmail.com
+          <Link
+            href={`mailto:codechefvit@gmail.com`}
+            className="flex flex-row items-center gap-2"
+          >
+            <Mail /> codechefvit@gmail.com
           </Link>
         </div>
       </div>
-      <p className="play mt-4 text-lg text-black dark:text-white md:text-center">
+      <p className="play mt-4 border-t border-[#130E1F] pt-12 text-center text-lg text-black dark:border-white/10 dark:text-white">
         Made with ❤️ by Codechef-VIT
       </p>
     </footer>

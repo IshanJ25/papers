@@ -90,7 +90,7 @@ function SideBar({
   }, [loading]);
   return (
     <div
-      className={`no-scrollbar sticky top-[85px] mb-0 h-[100vh] min-w-fit flex-col items-baseline overflow-y-scroll border-r-2 border-[#36266d] bg-[#f3f5ff] py-[40px] dark:bg-[#070114] md:flex`}
+      className={`no-scrollbar mb-0 h-[100vh] min-w-fit flex-col items-baseline overflow-y-scroll border-r-2 border-[#36266d] bg-[#f3f5ff] py-[40px] dark:bg-[#070114] md:flex`}
     >
       <div className="px-[10px] md:w-[100%]">
         {/* <SearchBar /> */}

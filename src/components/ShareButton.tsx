@@ -29,8 +29,7 @@ export default function ShareButton() {
   return (
     <Dialog>
       <DialogTrigger asChild>
-        <Button>
-          {" "}
+        <Button className="aspect-square h-10 w-10 p-0">
           <FaShare />
         </Button>
       </DialogTrigger>
