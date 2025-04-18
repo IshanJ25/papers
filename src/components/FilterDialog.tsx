@@ -64,10 +64,11 @@ export const FilterDialog = ({
     label: semester,
     value: semester,
   }));
-  const campuses = filterOptions.uniqueCampuses.map((campus) => ({
-    label: campus,
-    value: campus,
-  }));
+
+  // const campuses = filterOptions.uniqueCampuses.map((campus) => ({
+  //   label: campus,
+  //   value: campus,
+  // }));
 
   const handleFilterClick = () => {
     onApplyFilters(selectedExams, selectedSlots, selectedYears);
