@@ -15,8 +15,8 @@ export default function manifest(): MetadataRoute.Manifest {
       "Discover previous year question papers created by CodeChef-VIT at Vellore Institute of Technology",
     start_url: "/",
     display: "standalone",
-    background_color: "#070114",
-    theme_color: "#070114",
+    background_color: "#10011a",
+    theme_color: "#10011a",
     categories: [
       "education",
       "reference",
