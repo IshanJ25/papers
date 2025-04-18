@@ -15,7 +15,7 @@ function Info() {
           <span>your CATs and FATs </span>
           <span>with CodeChef-</span>
           <span>VIT’s dedicated </span>
-          <span>repository of past</span>
+          <span>repository of past </span>
           <span>exam papers</span>
         </div>
         <div className="grid play gap-4 text-[12px] text-black dark:text-white md:grid-cols-3 xl:text-[16px]">
