@@ -7,6 +7,7 @@ import { Download, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "./ui/button";
 import { extractBracketContent } from "@/util/utils";
 import { downloadFile } from "./CatalogueContent";
+import ShareButton from "./ShareButton";
 
 // Set up PDF.js worker
 pdfjs.GlobalWorkerOptions.workerSrc = new URL(
@@ -88,17 +89,18 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
       </div>
 
       {/* Controls */}
-      <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#160820] p-4 shadow sm:flex-row">
+      <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#262635] p-4 shadow sm:flex-row">
         {/* Page Navigation */}
+        <ShareButton />
         <Button onClick={downloadPDF}><Download/></Button>
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={goToPreviousPage}
             disabled={pageNumber <= 1}
-            className="rounded bg-[#3d2075] px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
+            className="rounded  px-3 py-1 disabled:opacity-50 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
           >
             {"<"}
-          </button>
+          </Button>
           <input
             type="number"
             value={pageNumber}
@@ -108,32 +110,32 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
             className="w-16 rounded border p-1 text-center"
           />
           <span>of {numPages ?? 1}</span>
-          <button
+          <Button
             onClick={goToNextPage}
             disabled={pageNumber >= (numPages ?? 1)}
-            className="rounded bg-[#3d2075] px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
+            className="rounded  disabled:opacity-50 px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
           >
             {">"}
-          </button>
+          </Button>
         </div>
 
         {/* Zoom Controls */}
         <div className="flex items-center gap-2">
-          <button
+          <Button
             onClick={zoomOut}
             disabled={scale <= 0.25}
-            className="rounded bg-[#3d2075] px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
+            className="rounded  px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
           >
             <ZoomOut />
-          </button>
+          </Button>
           <span>{(scale * 100).toFixed(0)}%</span>
-          <button
+          <Button
             onClick={zoomIn}
             disabled={scale >= 3}
-            className="rounded bg-[#3d2075] px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
+            className="rounded  px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
           >
             {<ZoomIn />}
-          </button>
+          </Button>
         </div>
       </div>
 
