@@ -83,7 +83,6 @@ function StoredPapers() {
           </div>
           <CarouselContent>
             {chunkedPapers.map((paperGroup, index) => {
-              // console.log(8 - paperGroup.length);
               return (
                 <CarouselItem
                   key={`carousel-item-${index}`}
