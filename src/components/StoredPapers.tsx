@@ -1,47 +1,107 @@
 "use client";
-import papers from "ongoing-papers";
 import { useEffect, useState } from "react";
 import axios from "axios";
 import { type IUpcomingPaper } from "@/interface";
 import Loader from "./ui/loader";
 import UpcomingPaper from "./UpcomingPaper";
+import {
+  Carousel,
+  CarouselContent,
+  CarouselItem,
+  CarouselNext,
+  CarouselPrevious,
+} from "@/components/ui/carousel";
+import Autoplay from "embla-carousel-autoplay";
+import { chunkArray } from "@/util/utils";
 
 function StoredPapers() {
   const [displayPapers, setDisplayPapers] = useState<IUpcomingPaper[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [chunkSize, setChunkSize] = useState<number>(4);
+
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth < 640) {
+        setChunkSize(4);
+      } else {
+        setChunkSize(8);
+      }
+    };
+
+    handleResize();
+    window.addEventListener("resize", handleResize);
+
+    return () => {
+      window.removeEventListener("resize", handleResize);
+    };
+  }, []);
+
+  const chunkedPapers = chunkArray(displayPapers, chunkSize);
 
   useEffect(() => {
     async function fetchPapers() {
       try {
+        setIsLoading(true);
         const response = await axios.get<IUpcomingPaper[]>(
           "/api/upcoming-papers",
         );
         setDisplayPapers(response.data);
       } catch (error) {
         console.error("Failed to fetch papers:", error);
+      } finally {
+        setIsLoading(false);
       }
     }
 
     void fetchPapers();
   }, []);
 
-  if (displayPapers.length === 0) {
+  if (isLoading) {
     return <Loader prop="m-10" />;
   }
 
+  const plugins = [Autoplay({ delay: 3000, stopOnInteraction: true })];
+
   return (
-    <div className="h-min">
+    <div className="px-4">
       <p className="play my-8 text-center text-lg font-semibold">
         Upcoming Papers
       </p>
 
-      <div className="grid grid-cols-1 justify-center gap-6 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 px-6">
-        {displayPapers.map((paper: IUpcomingPaper) => (
-          <UpcomingPaper
-            key={paper.subject}
-            subject={paper.subject}
-            slots={paper.slots}
-          />
-        ))}
+      <div className="">
+        <Carousel
+          opts={{
+            align: "start",
+            loop: true,
+          }}
+          plugins={plugins}
+          className="w-full"
+        >
+          <div className="relative mt-4 flex justify-end gap-4">
+            <CarouselPrevious className="relative" />
+            <CarouselNext className="relative" />
+          </div>
+          <CarouselContent>
+            {chunkedPapers.map((paperGroup, index) => {
+              console.log(8 - paperGroup.length);
+              return (
+                <CarouselItem
+                  key={`carousel-item-${index}`}
+                  className="grid grid-cols-2 grid-rows-2 gap-4 md:grid-cols-4 lg:auto-rows-fr"
+                >
+                  {paperGroup.map((paper, subIndex) => (
+                    <div key={subIndex} className="h-full">
+                      <UpcomingPaper
+                        subject={paper.subject}
+                        slots={paper.slots}
+                      />
+                    </div>
+                  ))}
+                </CarouselItem>
+              );
+            })}
+          </CarouselContent>
+        </Carousel>
       </div>
     </div>
   );

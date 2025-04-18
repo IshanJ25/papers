@@ -22,11 +22,9 @@ export async function GET() {
     const correspondingSlots = [slot + "1", slot + "2"];
     const selectedSubjects = await UpcomingSubject.find({
       slots: { $in: correspondingSlots }, // Match any slot in the array
-    }).limit(8);
-    const subbbb = await UpcomingSubject.find({
-
-    }).limit(8);
-    console.log(correspondingSlots, subbbb)
+    });
+    const subbbb = await UpcomingSubject.find({});
+    console.log(correspondingSlots, subbbb);
     if (selectedSubjects.length === 0) {
       return NextResponse.json(
         {

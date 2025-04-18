@@ -25,9 +25,19 @@ export function extractWithoutBracketContent(subject: string): string {
 
 export function capsule(data: string) {
   return (
-    <div className=" rounded-sm bg-[#B2B8FF] dark:bg-[#7480FFCC] p-1 px-3 text-sm">{data}</div>
+    <div className="rounded-sm bg-[#B2B8FF] p-1 px-3 text-sm dark:bg-[#7480FFCC]">
+      {data}
+    </div>
   );
 }
 export function capsuleGreen(data: string) {
   return <div className="rounded-md bg-[#3cc923] p-1 px-3 text-sm">{data}</div>;
+}
+
+export function chunkArray<T>(array: T[], size: number): T[][] {
+  const result: T[][] = [];
+  for (let i = 0; i < array.length; i += size) {
+    result.push(array.slice(i, i + size));
+  }
+  return result;
 }

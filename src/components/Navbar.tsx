@@ -10,7 +10,7 @@ function Navbar() {
   const pathname = usePathname();
 
   return (
-    <div className="sticky top-0 z-10 flex h-[85px] w-full items-center justify-between gap-x-3 overflow-hidden bg-[#B2B8FF] px-2 py-6 dark:bg-[#1d162d] md:px-12">
+    <div className="sticky top-0 z-10 flex h-[85px] w-full items-center justify-between gap-x-3 overflow-hidden bg-[#B2B8FF] px-2 py-6 dark:bg-[#130E1F] md:px-12">
       <div className="flex items-center gap-x-2 md:w-auto">
         <a href="https://www.codechefvit.com/" className="inline-block">
           <Image
