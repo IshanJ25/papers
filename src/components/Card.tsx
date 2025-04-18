@@ -79,7 +79,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
 
         <div className="justify-center">
           <div className="flex flex-row items-center justify-between px-4 pb-2">
-            <div className="font-sans text-sm font-medium">
+            <div className="play text-md font-medium">
               {extractBracketContent(paper.subject)}
             </div>
             <div className="flex gap-2">
