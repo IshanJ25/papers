@@ -56,11 +56,11 @@ function Faq() {
     <>
       <div
         id="faq"
-        className="mb-8 w-full px-6 text-center text-4xl font-bold text-[#120020] dark:text-white lg:text-left lg:text-5xl"
+        className="vipnabd mb-8 w-full px-6 text-center text-4xl font-bold text-[#120020] dark:text-white lg:text-left lg:text-5xl"
       >
         Frequently Asked Questions
       </div>
-      <div className="mx-auto w-full space-y-6 px-6">
+      <div className="mx-auto play w-full space-y-6 px-6">
         {faqs.map((faq, index) => (
           <div
             key={index}
@@ -80,11 +80,10 @@ function Faq() {
               </button>
             </div>
             <div
-              className={`overflow-hidden transition-all duration-300 ease-in-out ${
-                faqActive === index
-                  ? "max-h-40 opacity-100"
-                  : "max-h-0 opacity-0"
-              }`}
+              className={`overflow-hidden transition-all duration-300 ease-in-out ${faqActive === index
+                ? "max-h-40 opacity-100"
+                : "max-h-0 opacity-0"
+                }`}
             >
               <p className="mt-2 text-black dark:text-white">{faq.answer}</p>
             </div>
