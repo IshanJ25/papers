@@ -22,7 +22,7 @@ function Info() {
           <FeatureCard icon={<User size={32} />} text="No Sign-up required" />
           <FeatureCard
             isHighlight
-            highlightText="900+"
+            highlightText="1200+"
             subText="Past Year Papers"
           />
           <FeatureCard

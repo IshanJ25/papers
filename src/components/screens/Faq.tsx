@@ -5,31 +5,47 @@ import { useState } from "react";
 function Faq() {
   const faqs = [
     {
-      question: "What makes papers unique?",
+      question: "How do you source exam papers for the website?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+        "We continuously update our database with the latest exam papers to ensure comprehensive coverage. Additionally, users can contribute by uploading papers directly to our platform, helping us grow our collection.",
     },
     {
-      question: "How are papers created?",
+      question: "Is logging in required to download exam papers?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Ut enim ad minim veniam, quis nostrud exercitation ullamco.",
+        "No login is needed! You can freely browse and download exam papers without creating an account.",
     },
     {
-      question: "Why choose our papers?",
+      question: 'What is meant by "flexible search" for exam papers?',
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Duis aute irure dolor in reprehenderit in voluptate velit.",
+        "Our flexible search feature allows you to filter exam papers using multiple criteria, such as exam type, slot, year, subject, and more, making it easy to find exactly what you need.",
     },
     {
-      question: "What is the quality of papers?",
+      question: "How can I upload an exam paper to the website?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Excepteur sint occaecat cupidatat non proident.",
+        'To upload a paper, click the "Upload" button located at the top-right corner of the page. You can submit papers in PDF or image formats, especially if they’re not already available on our site.',
     },
     {
-      question: "How to order papers?",
+      question: "Do you provide papers for soft skills?",
+      answer: "lmao",
+    },
+    {
+      question: "How do I reach out for support or assistance?",
       answer:
-        "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sunt in culpa qui officia deserunt mollit anim id est laborum.",
+        'For any queries or issues, contact our support team via the "Contact Us" section on the website. We’re here to help with all your questions about exam papers and site features.',
+    },
+    {
+      question:
+        "What should I do if I can’t find a specific exam paper on the website?",
+      answer:
+        "Our database is regularly updated with both new and older exam papers. If the paper you’re looking for isn’t available, you can upload it yourself to share with the community.",
+    },
+    {
+      question: "Are uploaded papers immediately visible on the website?",
+      answer:
+        "Once uploaded, our AI system identifies and categorizes the paper by subject, slot, and other relevant tags. The paper then undergoes a quick manual review to ensure quality before it becomes visible on the site.",
     },
   ];
+
   const [faqActive, setFaqActive] = useState<number | null>(null);
 
   const handleClick = (index: number) => {

@@ -3,7 +3,6 @@
 import React, { useEffect, useState } from "react";
 import { fetchSubjects } from "./Searchbar/searchbar";
 import { Button } from "./ui/button";
-import Image from "next/image";
 import { Filter } from "lucide-react";
 
 import { type Filters, type IPaper } from "@/interface";
@@ -14,7 +13,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from "@/components/ui/accordion";
-import closeIcon from "../assets/close.svg";
+
 import SearchbarChild from "./Searchbar/searchbar-child";
 
 function SideBar({
@@ -26,15 +25,12 @@ function SideBar({
   selectedCampuses,
   selectedSemesters,
   selectedAnswerKeyIncluded,
-  noAppliedFilters,
-  subject,
   filterOptions,
   handleSelectAll,
   handleDeselectAll,
   selectedPapers,
   handleDownloadAll,
   handleApplyFilters,
-  closeFilters,
 }: {
   filtersNotPulled: () => void;
   loading: boolean;
@@ -77,10 +73,10 @@ function SideBar({
     label: semester,
     value: semester,
   }));
-  const campuses = filterOptions?.uniqueCampuses.map((campus) => ({
-    label: campus,
-    value: campus,
-  }));
+  // const campuses = filterOptions?.uniqueCampuses.map((campus) => ({
+  //   label: campus,
+  //   value: campus,
+  // }));
   const [subjects, setSubjects] = useState<string[]>([]);
   useEffect(() => {
     async function fetchSubjectsSidebar() {
