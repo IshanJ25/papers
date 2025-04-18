@@ -1,224 +1,329 @@
+"use client";
+
 import { useSearchParams } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import axios, { type AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { type IPaper, type Filters } from "@/interface";
-import { FilterDialog } from "@/components/FilterDialog";
 import Card from "./Card";
 import { extractBracketContent } from "@/util/utils";
 import { useRouter } from "next/navigation";
-import SearchBar from "./searchbar";
 import Loader from "./ui/loader";
-import { campuses, semesters } from "./select_options";
+import filterIcon from "../assets/filterIcon.svg";
+import filterd from "@/assets/filterd.svg";
+import Image from "next/image";
+import SideBar from "../components/SideBar";
+import toast from "react-hot-toast";
+import Error from "./Error";
+import { Filter } from "lucide-react";
+import {
+  Sheet,
+  SheetContent,
+  SheetDescription,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "./ui/sheet";
+export async function downloadFile(url: string, filename: string) {
+  try {
+    const response = await axios.get(url, { responseType: "blob" });
+    const blob = new Blob([response.data]);
+    const link = document.createElement("a");
+    link.href = window.URL.createObjectURL(blob);
+    link.download = filename;
+    link.click();
+    window.URL.revokeObjectURL(link.href);
+  } catch (error) { }
+}
 
 const CatalogueContent = () => {
-  const searchParams = useSearchParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const subject = searchParams.get("subject");
   const exams = searchParams.get("exams")?.split(",");
   const slots = searchParams.get("slots")?.split(",");
   const years = searchParams.get("years")?.split(",");
-  const semesters = searchParams.get("semesters")?.split(",");
-  const campuses = searchParams.get("campuses")?.split(",");
+  const campuses = searchParams.get("campus")?.split(",");
+  const semesters = searchParams.get("semester")?.split(",");
+  const answerKeyIncluded = searchParams.get("answerkey") === "true";
 
-  const [selectedExams, setSelectedExams] = useState<string[] | undefined>(
-    exams,
+  // Initialize state with searchParams
+  const [selectedExams, setSelectedExams] = useState<string[]>(exams ?? []);
+  const [selectedSlots, setSelectedSlots] = useState<string[]>(slots ?? []);
+  const [selectedYears, setSelectedYears] = useState<string[]>(years ?? []);
+  const [selectedSemesters, setSelectedSemesters] = useState<string[]>(
+    semesters ?? [],
   );
-  const [selectedSlots, setSelectedSlots] = useState<string[] | undefined>(
-    slots,
+  const [selectedCampuses, setSelectedCampuses] = useState<string[]>(
+    campuses ?? [],
   );
-  const [selectedYears, setSelectedYears] = useState<string[] | undefined>(
-    years,
-  );
-
-  const handleResetFilters = () => {
-    setSelectedExams([]);
-    setSelectedSlots([]);
-    setSelectedYears([]);
-    router.push(`/catalogue?subject=${encodeURIComponent(subject!)}`);
-  };
-
+  const [selectedAnswerKeyIncluded, setSelectedAnswerKeyIncluded] =
+    useState<boolean>(answerKeyIncluded || false);
   const [papers, setPapers] = useState<IPaper[]>([]);
+  const [filteredPapers, setFilteredPapers] = useState<IPaper[]>([]);
   const [selectedPapers, setSelectedPapers] = useState<IPaper[]>([]);
   const [error, setError] = useState<string | null>(null);
-  const [loading, setLoading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(true);
   const [filterOptions, setFilterOptions] = useState<Filters>();
+  const [filtersPulled, setFiltersPulled] = useState<boolean>(false);
+  const [appliedFilters, setAppliedFilters] = useState<boolean>(false);
 
-  const handleSelectAll = () => setSelectedPapers(papers);
-  const handleDeselectAll = () => setSelectedPapers([]);
+  const filtersNotPulled = () => {
+    setFiltersPulled(false);
+  };
+  // Memoized effect to fetch papers
+  useEffect(() => {
+    if (!subject) return;
 
-  const handleDownloadAll = async () => {
+    const fetchPapers = async () => {
+      setLoading(true);
+      try {
+        const papersResponse = await axios.get<Filters>("/api/papers", {
+          params: { subject },
+        });
+        const data: Filters = papersResponse.data;
+        const papersData = data.papers;
+        setFilterOptions(data);
+        setPapers(papersData);
+
+        const filtered = papersData.filter((paper) => {
+          const examCondition = selectedExams.length
+            ? selectedExams.includes(paper.exam)
+            : true;
+          const slotCondition = selectedSlots.length
+            ? selectedSlots.includes(paper.slot)
+            : true;
+          const yearCondition = selectedYears.length
+            ? selectedYears.includes(paper.year)
+            : true;
+          const semesterCondition = selectedSemesters.length
+            ? selectedSemesters.includes(paper.semester)
+            : true;
+          const campusCondition = selectedCampuses.length
+            ? selectedCampuses.includes(paper.campus)
+            : true;
+          const answerkeyCondition = selectedAnswerKeyIncluded
+            ? paper.answerKeyIncluded
+            : true;
+          return (
+            examCondition &&
+            slotCondition &&
+            yearCondition &&
+            semesterCondition &&
+            campusCondition &&
+            answerkeyCondition
+          );
+        });
+        setFilteredPapers(filtered.length > 0 ? filtered : papersData);
+      } catch (error) {
+        setPapers([]);
+        if (axios.isAxiosError(error)) {
+          const axiosError = error as AxiosError<{ message?: string }>;
+          setError(
+            axiosError.response?.data?.message ?? "Error fetching papers",
+          );
+        } else {
+          setError("Error fetching papers");
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void fetchPapers();
+  }, [subject]); // just run on initial page render
+
+  // Memoized handlers
+  const handleSelectPaper = useCallback(
+    (paper: IPaper, isSelected: boolean) => {
+      setSelectedPapers((prev) =>
+        isSelected ? [...prev, paper] : prev.filter((p) => p._id !== paper._id),
+      );
+    },
+    [],
+  );
+
+  const handleDownloadAll = useCallback(async () => {
     for (const paper of selectedPapers) {
       const extension = paper.finalUrl.split(".").pop();
       const fileName = `${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}.${extension}`;
       await downloadFile(paper.finalUrl, fileName);
     }
-  };
+  }, [selectedPapers]);
 
-  async function downloadFile(url: string, filename: string) {
-    try {
-      const response = await axios.get(url, { responseType: "blob" });
-      const blob = new Blob([response.data]);
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-      window.URL.revokeObjectURL(link.href);
-    } catch (error) {}
-  }
+  const handleApplyFilters = useCallback(
+    (
+      exams: string[],
+      slots: string[],
+      years: string[],
+      campus: string[],
+      semester: string[],
+      anskey: boolean,
+    ) => {
+      setAppliedFilters(true);
 
-  const handleSelectPaper = (paper: IPaper, isSelected: boolean) => {
-    if (isSelected) {
-      setSelectedPapers((prev) => [...prev, paper]);
-    } else {
-      setSelectedPapers((prev) => prev.filter((p) => p._id !== paper._id));
-    }
-  };
-  const handleApplyFilters = (
-    exams: string[],
-    slots: string[],
-    years: string[],
-  ) => {
-    if (subject) {
       let pushContent = "/catalogue";
-      if (subject) {
-        pushContent = pushContent.concat(
-          `?subject=${encodeURIComponent(subject)}`,
-        );
-      }
-      if (exams !== undefined && exams.length > 0) {
-        pushContent = pushContent.concat(
-          `&exams=${encodeURIComponent(exams.join(","))}`,
-        );
-      }
-      if (slots !== undefined && slots.length > 0) {
-        pushContent = pushContent.concat(
-          `&slots=${encodeURIComponent(slots.join(","))}`,
-        );
-      }
-      if (years !== undefined && years.length > 0) {
-        pushContent = pushContent.concat(
-          `&years=${encodeURIComponent(years.join(","))}`,
-        );
-      }
+      if (subject) pushContent += `?subject=${encodeURIComponent(subject)}`;
+      if (exams.length > 0)
+        pushContent += `&exams=${encodeURIComponent(exams.join(","))}`;
+      if (slots.length > 0)
+        pushContent += `&slots=${encodeURIComponent(slots.join(","))}`;
+      if (years.length > 0)
+        pushContent += `&years=${encodeURIComponent(years.join(","))}`;
+      if (campus.length > 0)
+        pushContent += `&campus=${encodeURIComponent(campus.join(","))}`;
+      if (semester.length > 0)
+        pushContent += `&semester=${encodeURIComponent(semester.join(","))}`;
+      if (anskey) pushContent += "&answerkey=true";
+
       router.push(pushContent);
-    }
-    setSelectedExams(exams);
-    setSelectedSlots(slots);
-    setSelectedYears(years);
-    handleDeselectAll();
-  };
+      setSelectedExams(exams);
+      setSelectedSlots(slots);
+      setSelectedYears(years);
+      setSelectedCampuses(campus);
+      setSelectedSemesters(semester);
+      setSelectedAnswerKeyIncluded(anskey);
+      const filtered = papers.filter((paper) => {
+        const examCondition = exams.length ? exams.includes(paper.exam) : true;
+        const slotCondition = slots.length ? slots.includes(paper.slot) : true;
+        const yearCondition = years.length ? years.includes(paper.year) : true;
+        const semesterCondition = semester.length
+          ? semester.includes(paper.semester)
+          : true;
+        const campusCondition = campus.length
+          ? campus.includes(paper.campus)
+          : true;
+        const answerkeyCondition = anskey ? paper.answerKeyIncluded : true;
+        return (
+          examCondition &&
+          slotCondition &&
+          yearCondition &&
+          semesterCondition &&
+          campusCondition &&
+          answerkeyCondition
+        );
+      });
+      setFilteredPapers(filtered.length > 0 ? filtered : papers);
+    },
+    [subject, router, papers],
+  );
 
-  useEffect(() => {
-    if (subject) {
-      const fetchPapers = async () => {
-        setLoading(true);
+  const closeFilters = useCallback(() => {
+    setFiltersPulled(false);
+  }, []);
 
-        try {
-          const papersResponse = await axios.get<Filters>("/api/papers", {
-            params: { subject },
-          });
-          const Data: Filters = papersResponse.data;
-          const papersData = Data.papers;
-          const filters: Filters = papersResponse.data;
+  const noAppliedFilters = useCallback(() => {
+    setAppliedFilters(false);
+  }, []);
 
-          setFilterOptions(filters);
+  const handleSelectAll = useCallback(() => {
+    setSelectedPapers(appliedFilters ? filteredPapers : papers);
+  }, [appliedFilters, filteredPapers, papers]);
 
-          const papersDataWithFilters = papersData.filter((paper) => {
-            const examCondition = exams?.length
-              ? exams.includes(paper.exam)
-              : true;
-            const slotCondition = slots?.length
-              ? slots.includes(paper.slot)
-              : true;
-            const yearCondition = years?.length
-              ? years.includes(paper.year)
-              : true;
+  const handleDeselectAll = useCallback(() => {
+    setSelectedPapers([]);
+  }, []);
 
-            return examCondition && slotCondition && yearCondition;
-          });
-
-          setPapers(
-            papersDataWithFilters.length >= 0
-              ? papersDataWithFilters
-              : papersData,
-          );
-        } catch (error) {
-          if (axios.isAxiosError(error)) {
-            const axiosError = error as AxiosError<{ message?: string }>;
-            setError(
-              axiosError.response?.data?.message ?? "Error fetching papers",
-            );
-          } else {
-            setError("Error fetching papers");
-          }
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      void fetchPapers();
-    }
-  }, [subject, searchParams]);
 
   return (
-    <div className="min-h-screen px-2 md:p-8">
-      <div className="mb-10 flex w-full flex-row items-center md:justify-between  md:gap-10">
-        <div className=" w-[120%] md:w-[576px]">
-          <SearchBar />
-        </div>
-        <div className="flex gap-8">
-          {subject && filterOptions && (
-            <FilterDialog
-              subject={subject}
-              filterOptions={filterOptions}
-              initialExams={exams}
-              initialSlots={slots}
-              initialYears={years}
-              initialCampuses={campuses}
-              initialSemesters={semesters}
-              onReset={handleResetFilters}
-              onApplyFilters={handleApplyFilters}
-            />
-          )}{" "}
-          <div className=" hidden items-center justify-center gap-2 md:flex md:justify-end 2xl:mr-4">
-            <Button variant="outline" onClick={handleSelectAll} className="font-sans font-semibold border-2 border-black dark:border-[#434dba] hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 dark:hover:border-white">
-              Select All
-            </Button>
-            <Button variant="outline" onClick={handleDeselectAll} className="font-sans font-semibold border-2 border-black dark:border-[#434dba] hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 dark:hover:border-white">
-              Deselect All
-            </Button>
-            <Button
-              variant="outline"
-              onClick={handleDownloadAll}
-              disabled={selectedPapers.length === 0}
-              className="font-sans font-semibold border-2 border-black dark:border-[#434dba] hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 dark:hover:border-white"
-            >
-              Download All ({selectedPapers.length})
-            </Button>
-          </div>
-        </div>
+    <div className="relative flex min-h-screen justify-center p-0 md:justify-normal">
+      <div className="hidden w-[30%] min-w-fit md:block">
+        <SideBar
+          filtersNotPulled={filtersNotPulled}
+          loading={loading}
+          selectedExams={selectedExams}
+          selectedSlots={selectedSlots}
+          selectedYears={selectedYears}
+          selectedSemesters={selectedSemesters}
+          selectedCampuses={selectedCampuses}
+          selectedAnswerKeyIncluded={selectedAnswerKeyIncluded}
+          noAppliedFilters={noAppliedFilters}
+          handleApplyFilters={handleApplyFilters}
+          handleSelectAll={handleSelectAll}
+          handleDeselectAll={handleDeselectAll}
+          selectedPapers={selectedPapers}
+          subject={subject}
+          filterOptions={filterOptions}
+          handleDownloadAll={handleDownloadAll}
+          closeFilters={closeFilters}
+        />
       </div>
 
-      {error && <p className="text-red-500">{error}</p>}
-      {loading ? (
-        <Loader />
-      ) : papers.length > 0 ? (
-        <>
-          <div className="mx-auto flex flex-col flex-wrap items-center justify-center gap-10 md:flex-row md:justify-normal">
-            {papers.map((paper) => (
-              <Card
-                key={paper._id}
-                paper={paper}
-                onSelect={(p, isSelected) => handleSelectPaper(p, isSelected)}
-                isSelected={selectedPapers.some((p) => p._id === paper._id)}
-              />
-            ))}
+      {/* {error && <p className="text-red-500">{error}</p>} */}
+      <div className="w-full">
+        <Sheet>
+          <SheetTrigger className="mx-8 mt-8 block md:hidden">
+            <Button
+              variant="outline"
+              className="flex gap-2 border-2 border-black font-sans font-semibold hover:bg-slate-800 hover:text-white dark:border-[#434dba] dark:hover:border-white dark:hover:bg-slate-900"
+            >
+              <Filter size={18} />
+              Add Filters
+            </Button>
+          </SheetTrigger>
+          <SheetContent
+            side={"left"}
+            className="m-0 bg-[#f3f5ff] p-0 pt-4 dark:bg-[#070114]"
+          >
+            <SideBar
+              filtersNotPulled={filtersNotPulled}
+              loading={loading}
+              selectedExams={selectedExams}
+              selectedSlots={selectedSlots}
+              selectedYears={selectedYears}
+              selectedSemesters={selectedSemesters}
+              selectedCampuses={selectedCampuses}
+              selectedAnswerKeyIncluded={selectedAnswerKeyIncluded}
+              noAppliedFilters={noAppliedFilters}
+              handleApplyFilters={handleApplyFilters}
+              handleSelectAll={handleSelectAll}
+              handleDeselectAll={handleDeselectAll}
+              selectedPapers={selectedPapers}
+              subject={subject}
+              filterOptions={filterOptions}
+              handleDownloadAll={handleDownloadAll}
+              closeFilters={closeFilters}
+            />
+          </SheetContent>
+        </Sheet>
+
+        {loading ? (
+          <Loader />
+        ) : papers.length > 0 ? (
+          <div
+            className={`grid h-fit grid-cols-1 gap-8 px-[30px] py-[40px] md:grid-cols-2 lg:grid-cols-4 ${filtersPulled ? "blur-xl" : ""}`}
+          >
+            {appliedFilters ? (
+              filteredPapers.length > 0 ? (
+                filteredPapers.map((paper: IPaper) => (
+                  <Card
+                    key={paper._id}
+                    paper={paper}
+                    onSelect={handleSelectPaper}
+                    isSelected={selectedPapers.some((p) => p._id === paper._id)}
+                  />
+                ))
+              ) : (
+                <p>No papers available with the applied filter</p>
+              )
+            ) : (
+              papers.map((paper: IPaper) => (
+                <Card
+                  key={paper._id}
+                  paper={paper}
+                  onSelect={handleSelectPaper}
+                  isSelected={selectedPapers.some((p) => p._id === paper._id)}
+                />
+              ))
+            )}
           </div>
-        </>
-      ) : (
-        <p>No papers available for this subject.</p>
-      )}
+        ) : (
+          <Error
+            filtersPulled={filtersPulled}
+            message={error ?? "No papers available for this subject."}
+          />
+        )}
+      </div>
     </div>
   );
 };

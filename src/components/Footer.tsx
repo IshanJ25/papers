@@ -1,8 +1,5 @@
 "use client";
-import { Separator } from "./ui/separator";
-import ccLogo from "../assets/codechef_logo.svg";
-import Image from "next/image";
-import { Instagram, Linkedin, Youtube, Github } from "lucide-react";
+
 import meta_icon from "../assets/meta_icon.svg";
 import x_twitter_icon from "../assets/x_twitter_icon.svg";
 import meta_icon_dark from "../assets/meta_icon_dark.svg";
@@ -11,9 +8,17 @@ import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useEffect, useState } from "react";
 import { Button } from "./ui/button";
+import {
+  FaFacebook,
+  FaGithub,
+  FaSquareInstagram,
+  FaLinkedin,
+  FaXTwitter,
+  FaYoutube,
+} from "react-icons/fa6";
 
 export default function Footer() {
-  const { theme, setTheme } = useTheme();
+  const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
 
   useEffect(() => {
@@ -23,78 +28,78 @@ export default function Footer() {
   }, [theme]);
 
   return (
-    <div className="mx-auto flex flex-col items-center justify-between gap-y-12 pt-12 md:pt-8 lg:w-full lg:flex-row lg:justify-around lg:px-12 mb-4">
-      <div className="flex items-center">
-        <h1 className="jost bg-gradient-to-r from-[#562EE7] to-[rgba(116,128,255,0.8)] bg-clip-text text-center text-3xl font-bold text-transparent lg:text-5xl 2xl:text-6xl dark:from-[#562EE7] dark:to-[#FFC6E8]">
-          Papers
-        </h1>
-        <Separator orientation="vertical" className="mx-3 h-full min-h-20" />
-        <div className="flex items-center">
-          <Image
-            src={ccLogo as HTMLImageElement}
-            alt="codechef-logo"
-            height={70}
-            width={70}
-          />
-          <p className="jost text-2xl font-bold lg:text-4xl">CodeChef-VIT</p>
+    <footer className="w-full overflow-hidden bg-gradient-to-b from-[#F3F5FF] to-[#A599CE] px-12 py-12 font-sans text-white dark:from-[#070114] dark:to-[#1F0234]">
+      <div className="mx-auto flex max-w-[1440px] flex-col gap-y-4 lg:flex-row lg:justify-between">
+        <div className="flex flex-col gap-4 lg:items-start lg:text-left">
+          <h1 className="jost mb-5 bg-gradient-to-r from-[#562EE7] to-[rgba(116,128,255,0.8)] bg-clip-text text-left text-7xl font-bold tracking-wide text-transparent dark:from-[#562EE7] dark:to-[#FFC6E8]">
+            Papers
+          </h1>
+
+          <div className="-ml-2 flex flex-wrap gap-2 lg:justify-start">
+            <Link href="https://www.instagram.com/codechefvit/" target="_blank">
+              <Button variant="ghost" className="aspect-square h-10 w-10 p-0">
+                <FaSquareInstagram
+                  className="text-black dark:text-white"
+                  size={18}
+                />
+              </Button>
+            </Link>
+            <Link
+              href="https://www.linkedin.com/company/codechefvit/"
+              target="_blank"
+            >
+              <Button variant="ghost" className="aspect-square h-10 w-10 p-0">
+                <FaLinkedin className="text-black dark:text-white" size={18} />
+              </Button>
+            </Link>
+            <Link href="https://www.youtube.com/@CodeChefVIT" target="_blank">
+              <Button variant="ghost" className="aspect-square h-10 w-10 p-0">
+                <FaYoutube className="text-black dark:text-white" size={18} />
+              </Button>
+            </Link>
+            <Link href="https://github.com/CodeChefVIT" target="_blank">
+              <Button variant="ghost" className="aspect-square h-10 w-10 p-0">
+                <FaGithub className="text-black dark:text-white" size={18} />
+              </Button>
+            </Link>
+            <Link href="https://www.facebook.com/codechefvit/" target="_blank">
+              <Button variant="ghost" className="aspect-square h-10 w-10 p-0">
+                <FaFacebook className="text-black dark:text-white" size={18} />
+              </Button>
+            </Link>
+            <Link
+              href="https://x.com/codechefvit"
+              className="pb-1.5"
+              target="_blank"
+            >
+              <Button variant="ghost" className="aspect-square h-10 w-10 p-0">
+                <FaXTwitter className="text-black dark:text-white" size={18} />
+              </Button>
+            </Link>
+          </div>
+        </div>
+        {/* <div className="flex flex-col items-center gap-2 text-center text-black dark:text-white lg:items-start lg:text-left">
+          <h3 className="jost text-2xl font-semibold">Menu</h3>
+          <Link href="/#search">Search</Link>
+          <Link href="/#features">Features</Link>
+          <Link href="/#faq">FAQ</Link>
+        </div> */}
+        {/* <div className="flex flex-col items-center gap-2 text-center text-black dark:text-white lg:items-start lg:text-left">
+          <h3 className="jost text-2xl font-semibold">Our Projects</h3>
+          <Link href="/">Papers</Link>
+          <Link href="/">FFCS-inator</Link>
+          <Link href="/">Brainrot Arcade</Link>
+        </div> */}
+        <div className="flex flex-col gap-2 text-black dark:text-white lg:items-start lg:text-left">
+          <h3 className="jost text-2xl font-semibold">Contact Us</h3>
+          <Link href={`mailto:codechefvit@gmail.com`}>
+            codechefvit@gmail.com
+          </Link>
         </div>
       </div>
-      <div>
-        <div className="flex items-center gap-x-8">
-          <Link href="https://www.instagram.com/codechefvit/">
-            <Button variant="ghost" size="icon">
-              <Instagram />
-            </Button>
-          </Link>
-          <Link href="https://www.linkedin.com/company/codechefvit/">
-            <Button variant="ghost" size="icon">
-              <Linkedin />
-            </Button>
-          </Link>
-          <Link href="https://www.youtube.com/@CodeChefVIT">
-            <Button variant="ghost" size="icon">
-              <Youtube />
-            </Button>
-          </Link>
-          <Link href="https://github.com/CodeChefVIT">
-            <Button variant="ghost" size="icon">
-              <Github />
-            </Button>
-          </Link>
-          <Link href="https://www.facebook.com/codechefvit/">
-            <Button variant="ghost" size="icon">
-              <Image
-                src={
-                  isDarkMode
-                    ? (meta_icon_dark as HTMLInputElement)
-                    : (meta_icon as HTMLInputElement)
-                }
-                alt="meta-icon"
-                height={24}
-                width={24}
-              />
-            </Button>
-          </Link>
-          <Link href="https://x.com/codechefvit" className="pb-1.5">
-            <Button variant="ghost" size="icon">
-              <Image
-                src={
-                  isDarkMode
-                    ? (x_twitter_icon_dark as HTMLInputElement)
-                    : (x_twitter_icon as HTMLInputElement)
-                }
-                alt="x_twitter_icon"
-                height={24}
-                width={24}
-              />
-            </Button>
-          </Link>
-        </div>
-        {/* <p className="hidden text-center text-xl lg:block">
-          Made with 💜 By Codechef-VIT
-        </p> */}
-      </div>
-      <p className="block text-xl lg:hidden">Made with 💜 By Codechef-VIT</p>
-    </div>
+      <p className="play mt-4 text-lg text-black dark:text-white md:text-center">
+        Made with ❤️ by Codechef-VIT
+      </p>
+    </footer>
   );
 }

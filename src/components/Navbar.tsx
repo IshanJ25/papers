@@ -1,48 +1,47 @@
-"use client"
+"use client";
 import ccLogo from "../assets/codechef_logo.svg";
 import Image from "next/image";
-import { Button } from "@/components/ui/button";
 import ModeToggle from "@/components/toggle-theme";
-import { ArrowUpToLine } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { ArrowDownLeftIcon } from "lucide-react";
 
 function Navbar() {
   const pathname = usePathname();
 
   return (
-    <div className="flex items-center justify-between gap-x-3 w-[90%] md:w-full overflow-x-hidden px-2 py-6 md:px-12">
-      <div className="hidden w-[20%] md:block">
+    <div className="sticky top-0 z-10 flex h-[85px] w-full items-center justify-between gap-x-3 overflow-hidden bg-[#B2B8FF] px-2 py-6 dark:bg-[#130E1F] md:px-12">
+      <div className="flex items-center gap-x-2 md:w-auto">
         <a href="https://www.codechefvit.com/" className="inline-block">
           <Image
             src={ccLogo as HTMLImageElement}
             alt="codechef-logo"
-            height={70}
-            width={70}
+            height={60}
+            width={60}
           />
         </a>
-      </div>
-      <div>
         <Link
           href="/"
-          className="jost tracking-wide bg-gradient-to-r from-[#562EE7] to-[rgba(116,128,255,0.8)] bg-clip-text text-center text-4xl font-extrabold text-transparent dark:from-[#562EE7] dark:to-[#FFC6E8] md:w-[60%] md:text-6xl"
+          className="jost bg-gradient-to-r from-[#562EE7] to-[rgba(116,128,255,0.8)] bg-clip-text text-left text-4xl font-bold tracking-wide text-transparent dark:from-[#562EE7] dark:to-[#FFC6E8] md:text-6xl"
         >
           Papers
         </Link>
       </div>
-      <div className="flex items-center justify-end gap-x-2 md:w-[20%]">
-        <div className="hidden md:block">
+      <div className="md:w/[20%] flex items-center justify-end gap-x-2">
+        <div className="scale-75 sm:scale-100">
           <ModeToggle />
         </div>
 
-        <Link href={pathname == "/upload" ? "/" :"/upload"}>
-          <div className="md:p-[2px] bg-gradient-to-r from-[#562EE7] to-[#bd21b4] rounded-full">
-              <div className="whitespace-nowrap rounded-full font-bold text-xs md:text-sm mt-2 md:mt-0 bg-slate-200 dark:bg-black px-4 md:px-6 py-3 tracking-wider text-black dark:text-white font-sans hover:bg-white dark:hover:bg-slate-700">
-              {pathname == "/upload" ? "⇱ SEARCH PAPERS": "⇱ UPLOAD PAPERS"}
-              </div>
+        <Link href={pathname == "/upload" ? "/" : "/upload"}>
+          <div className="rounded-md bg-[#453D60] p-[1.5px] md:p-[2px]">
+            <div className="flex items-center gap-1 rounded-md bg-slate-200 px-2 py-1 text-[9px] font-bold tracking-tight text-black transition-all duration-150 hover:bg-white active:scale-95 dark:bg-[#171720] dark:text-white dark:hover:bg-slate-700 sm:gap-2 sm:px-3 sm:py-2 sm:text-[10px] md:px-6 md:text-sm">
+              <ArrowDownLeftIcon className="h-3 w-3 sm:h-4 sm:w-4 rotate-90" />
+              <span className="text-center font-semibold">
+                {pathname === "/upload" ? "SEARCH PAPERS" : "UPLOAD PAPERS"}
+              </span>
             </div>
+          </div>
         </Link>
-
       </div>
     </div>
   );

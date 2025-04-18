@@ -1,46 +1,19 @@
 "use client";
-
-import { Copy, Download, Eye, Maximize } from "lucide-react";
-import { Worker } from "@react-pdf-viewer/core";
-import { Viewer } from "@react-pdf-viewer/core";
-import { FaShare } from "react-icons/fa";
-
-import {
-  zoomPlugin,
-  ZoomInIcon,
-  ZoomOutIcon,
-  type RenderZoomOutProps,
-  type RenderZoomInProps,
-  type RenderCurrentScaleProps,
-} from "@react-pdf-viewer/zoom";
-import { getFilePlugin } from "@react-pdf-viewer/get-file";
-
-import {
-  fullScreenPlugin,
-  type RenderEnterFullScreenProps,
-} from "@react-pdf-viewer/full-screen";
-
-import "@react-pdf-viewer/full-screen/lib/styles/index.css";
-import "@react-pdf-viewer/core/lib/styles/index.css";
-import "@react-pdf-viewer/zoom/lib/styles/index.css";
-import Link from "next/link";
-import QR from "./qr";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "./ui/dialog";
+import "react-pdf/dist/Page/AnnotationLayer.css";
+import "react-pdf/dist/Page/TextLayer.css";
+import { useState } from "react";
+import { Document, Page, pdfjs } from "react-pdf";
+import { Download, ZoomIn, ZoomOut } from "lucide-react";
 import { Button } from "./ui/button";
-import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
-import toast from "react-hot-toast";
+import { extractBracketContent } from "@/util/utils";
+import { downloadFile } from "./CatalogueContent";
+import ShareButton from "./ShareButton";
 
-interface Params {
-  params: { id: string };
-}
+// Set up PDF.js worker
+pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+  "pdfjs-dist/build/pdf.worker.min.mjs",
+  import.meta.url,
+).toString();
 
 interface PdfViewerProps {
   url: string;
@@ -48,124 +21,126 @@ interface PdfViewerProps {
 }
 
 export default function PdfViewer({ url, name }: PdfViewerProps) {
-  const [origin, setOrigin] = useState("");
+  const [numPages, setNumPages] = useState<number>();
+  const [pageNumber, setPageNumber] = useState<number>(1);
+  const [scale, setScale] = useState<number>(1); // Default zoom level (100%)
 
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      setOrigin(window.location.origin);
+  // Handle document load success
+  function onDocumentLoadSuccess({ numPages }: { numPages: number }): void {
+    setNumPages(numPages);
+    setPageNumber(1); // Reset to page 1 when new document loads
+  }
+
+  // Navigate to previous page
+  const goToPreviousPage = () => {
+    setPageNumber((prev) => Math.max(1, prev - 1));
+  };
+
+  // Navigate to next page
+  const goToNextPage = () => {
+    setPageNumber((prev) => Math.min(numPages ?? 1, prev + 1));
+  };
+
+  // Handle page number input change
+  const handlePageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(e.target.value, 10);
+    if (!isNaN(value) && value >= 1 && value <= (numPages ?? 1)) {
+      setPageNumber(value);
     }
-  }, []);
+  };
 
-  const getFilePluginInstance = getFilePlugin({
-    fileNameGenerator: () => {
-      return name;
-    },
-  });
-  const zoomPluginInstance = zoomPlugin();
-  const { CurrentScale, ZoomIn, ZoomOut } = zoomPluginInstance;
-  const fullScreenPluginInstance = fullScreenPlugin();
-  const EnterFullScreen = fullScreenPluginInstance.EnterFullScreen.bind(
-    fullScreenPluginInstance,
-  );
+  // Zoom in (increase scale)
+  const zoomIn = () => {
+    setScale((prev) => Math.min(prev + 0.25, 3)); // Max scale: 300%
+  };
 
-  const pathname = usePathname();
-  const paperPath = origin + pathname;
+  // Zoom out (decrease scale)
+  const zoomOut = () => {
+    setScale((prev) => Math.max(prev - 0.25, 0.25)); // Min scale: 25%
+  };
+  const downloadPDF = async () => {
+    const fileName = `${name}.pdf`;
+    await downloadFile(url, fileName);
+  };
   return (
-    <div>
-      <div className="flex w-[95%] items-center justify-between bg-violet-400 px-4 py-4 dark:bg-gray-900 md:w-[80%]">
-        <div className="flex gap-x-4">
-          <ZoomOut>
-            {(props: RenderZoomOutProps) => (
-              <button onClick={props.onClick}>
-                <ZoomOutIcon />
-              </button>
-            )}
-          </ZoomOut>
-          <CurrentScale>
-            {(props: RenderCurrentScaleProps) => (
-              <>{`${Math.round(props.scale * 100)}%`}</>
-            )}
-          </CurrentScale>
+    <div className="flex flex-col items-center">
+      {/* PDF Document */}
+      <div className="max-h-[70vh] overflow-auto border border-gray-300 shadow-lg">
+        <Document
+          className="flex justify-center"
+          file={url}
+          onLoadSuccess={onDocumentLoadSuccess}
+          error={
+            <div className="p-4 text-red-500">Failed to load PDF file.</div>
+          }
+          loading={<div className="p-4 text-gray-500">Loading PDF...</div>}
+          noData={
+            <div className="p-4 text-gray-500">No PDF file specified.</div>
+          }
+        >
+          <Page
+            pageNumber={pageNumber}
+            scale={scale}
+            renderAnnotationLayer={true}
+            renderTextLayer={true}
+            className="w-max-[75vw] shadow-md"
+          />
+        </Document>
+      </div>
 
-          <ZoomIn>
-            {(props: RenderZoomInProps) => (
-              <button onClick={props.onClick}>
-                <ZoomInIcon />
-              </button>
-            )}
-          </ZoomIn>
+      {/* Controls */}
+      <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#262635] p-4 shadow sm:flex-row">
+        {/* Page Navigation */}
+        <ShareButton />
+        <Button onClick={downloadPDF}><Download/></Button>
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={goToPreviousPage}
+            disabled={pageNumber <= 1}
+            className="rounded  px-3 py-1 disabled:opacity-50 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
+          >
+            {"<"}
+          </Button>
+          <input
+            type="number"
+            value={pageNumber}
+            onChange={handlePageChange}
+            min={1}
+            max={numPages}
+            className="w-16 rounded border p-1 text-center"
+          />
+          <span>of {numPages ?? 1}</span>
+          <Button
+            onClick={goToNextPage}
+            disabled={pageNumber >= (numPages ?? 1)}
+            className="rounded  disabled:opacity-50 px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-[#706b7a]"
+          >
+            {">"}
+          </Button>
         </div>
-        <div className="flex gap-5">
-          <div className="hidden gap-x-4 md:flex md:items-center">
-            <getFilePluginInstance.Download>
-              {(props) => (
-                <button className="" onClick={() => props.onClick()}>
-                  <Download />
-                </button>
-              )}
-            </getFilePluginInstance.Download>
-            <EnterFullScreen>
-              {(props: RenderEnterFullScreenProps) => (
-                <button onClick={() => props.onClick()}>
-                  <Maximize />
-                </button>
-              )}
-            </EnterFullScreen>
-          </div>
-          <div className="flex gap-4">
-            <Link className=" md:hidden" href={url}>
-              <Download />
-            </Link>
 
-            <Dialog>
-              <DialogTrigger>
-                <FaShare></FaShare>
-              </DialogTrigger>
-              <DialogContent className="max-w-96 ">
-                <DialogHeader>
-                  <DialogTitle>Share Papers with your friends!</DialogTitle>
-                  <DialogDescription>
-                    Either scan the QR or copy the link and share
-                  </DialogDescription>
-                </DialogHeader>
-                <div className="flex flex-col items-center justify-center gap-5  ">
-                  <QR url={paperPath}></QR>
-                  <Button
-                    type="submit"
-                    size="sm"
-                    className="flex w-fit items-center justify-between gap-5 px-3"
-                    onClick={async () => {
-                      await toast.promise(
-                        navigator.clipboard.writeText(paperPath), // This is a promise
-                        {
-                          success: "Link copied successfully",
-                          loading: "Copying link...",
-                          error: "Error copying link",
-                        },
-                      );
-                    }}
-                  >
-                    <p>Copy Link To Clipboard</p>
-                    <Copy />
-                  </Button>
-                </div>
-              </DialogContent>
-            </Dialog>
-          </div>
+        {/* Zoom Controls */}
+        <div className="flex items-center gap-2">
+          <Button
+            onClick={zoomOut}
+            disabled={scale <= 0.25}
+            className="rounded  px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
+          >
+            <ZoomOut />
+          </Button>
+          <span>{(scale * 100).toFixed(0)}%</span>
+          <Button
+            onClick={zoomIn}
+            disabled={scale >= 3}
+            className="rounded  px-3 py-1 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
+          >
+            {<ZoomIn />}
+          </Button>
         </div>
       </div>
-      <Worker workerUrl="https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js">
-        <div className="border-1 w-[95%] overflow-x-hidden md:w-[80%]">
-          <Viewer
-            fileUrl={url}
-            plugins={[
-              zoomPluginInstance,
-              getFilePluginInstance,
-              fullScreenPluginInstance,
-            ]}
-          />
-        </div>
-      </Worker>
+
+      {/* Document Name */}
+      <p className="mt-2 text-gray-700">Viewing: {name}</p>
     </div>
   );
 }
