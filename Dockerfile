@@ -1,20 +1,35 @@
-# Step 1: Specify the base image
-FROM node:22
+# Step 1: Build stage
+FROM node:22-alpine AS builder
 
-# Step 2: Set the working directory inside the container
+# Set the working directory
 WORKDIR /app
 
-# Step 3: Copy package.json and package-lock.json files
+# Copy package.json and package-lock.json
 COPY package*.json ./
 
-# Step 4: Install dependencies
+# Install dependencies
 RUN npm install
 
-# Step 5: Copy the rest of the application code
+# Copy the rest of the application code
 COPY . .
 
-# Step 6: Expose the port the application runs on
+# Build the application
+RUN npm run build
+
+# Step 2: Production stage
+FROM node:22-alpine
+
+# Set the working directory
+WORKDIR /app
+
+# Copy only the built application and necessary files from the builder stage
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/.next ./.next
+COPY --from=builder /app/public ./public
+
+# Expose the port the application runs on
 EXPOSE 3000
 
-# Step 7: Define the command to run the application
-CMD ["npm","run","dev"]
+# Define the command to start the application
+CMD ["npm", "start"]
