@@ -97,10 +97,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
       {/* Controls */}
       <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#262635] p-4 shadow sm:flex-row">
         {/* Page Navigation */}
-        <ShareButton />
-        <Button onClick={downloadPDF} className="aspect-square h-10 w-10 p-0">
-          <Download />
-        </Button>
+
         <div className="flex items-center gap-2">
           <Button
             onClick={goToPreviousPage}
@@ -129,6 +126,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
 
         {/* Zoom Controls */}
         <div className="flex items-center gap-2">
+          {" "}
           <Button
             onClick={zoomOut}
             disabled={scale <= 0.25}
@@ -143,6 +141,10 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
             className="h-10 w-10 rounded p-0 text-white transition hover:bg-[#6536c1] disabled:bg-gray-300"
           >
             {<ZoomIn />}
+          </Button>
+          <ShareButton />
+          <Button onClick={downloadPDF} className="aspect-square h-10 w-10 p-0">
+            <Download />
           </Button>
         </div>
       </div>
