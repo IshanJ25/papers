@@ -1,29 +1,52 @@
 # Step 1: Build stage
-FROM node:22-alpine AS builder
+FROM node:23-alpine AS builder
+
+# Install dependencies required for building native modules
+RUN apk add --no-cache \
+    python3 \
+    make \
+    g++ \
+    pkgconfig \
+    pixman-dev \
+    cairo-dev \
+    pango-dev \
+    glib-dev \
+    jpeg-dev \
+    giflib-dev
+
+# Install pnpm globally
+RUN npm install -g pnpm
 
 # Set the working directory
 WORKDIR /app
 
-# Copy package.json and package-lock.json
-COPY package*.json ./
+# Copy package.json and pnpm-lock.yaml
+COPY package.json pnpm-lock.yaml ./
 
-# Install dependencies
-RUN npm install
+# Install dependencies using pnpm
+RUN pnpm install --frozen-lockfile
 
 # Copy the rest of the application code
 COPY . .
 
 # Build the application
-RUN npm run build
+RUN pnpm run build
 
 # Step 2: Production stage
-FROM node:22-alpine
+FROM node:23-alpine
+
+# Install pnpm globally
+RUN npm install -g pnpm
 
 # Set the working directory
 WORKDIR /app
 
+# Set NODE_ENV to production
+ENV NODE_ENV=production
+
 # Copy only the built application and necessary files from the builder stage
-COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/package.json ./
+COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/.next ./.next
 COPY --from=builder /app/public ./public
@@ -32,4 +55,4 @@ COPY --from=builder /app/public ./public
 EXPOSE 3000
 
 # Define the command to start the application
-CMD ["npm", "start"]
+CMD ["pnpm", "start"]
