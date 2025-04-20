@@ -1,4 +1,7 @@
 services:
-  backend:
-    image: ghcr.io/upayanmazumder/papers-codechef:latest
+  app:
     build: .
+    ports:
+      - "3000:3000"
+    env_file:
+      - .env.local
