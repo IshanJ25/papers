@@ -7,6 +7,7 @@
 > <p>Prepare to excel in your CATs and FATs with CodeChef-VIT's dedicated repository of past exam papers. Access key resources to review concepts, tackle challenging questions, and familiarize yourself with exam patterns. Boost your confidence, sharpen your strategy, and get ready to ace your exams!</p>
 
 ## 🌐 Deploy
+
 [https://papers.codechefvit.com](https://papers.codechefvit.com/)
 
 ## ⚙️ Tech Stack:
@@ -64,35 +65,25 @@ pnpm dev
 
 ## 🐳 Using Docker
 
-### 1. Build the Image
-Run in the project root:
-```bash
-docker build -t papers-codechef .
-```
+To run the application using Docker, follow these steps:
 
-### 2. Run the Container
-Start the app with:
-```bash
-docker run -p 3000:3000 papers-codechef
-```
-Access it at `http://localhost:3000`.
+1. **Build the Docker Image**:
 
-### 3. Environment Variables
-Ensure `.env` is configured. Use `--env-file` to pass it:
-```bash
-docker run --env-file .env -p 3000:3000 papers-codechef
-```
+   ```bash
+   docker build -t papers-codechef .
+   ```
 
-### 4. Stop & Clean Up
-Stop the container:
-```bash
-docker ps
-docker stop <CONTAINER ID>
-```
-Remove the image:
-```bash
-docker rmi papers-codechef
-```
+2. **Run the Docker Container**:
+
+   ```bash
+   docker run -p 3000:3000 --env-file .env papers-codechef
+   ```
+
+3. **Using Docker Compose**:
+   If you prefer `docker-compose`, ensure the `docker-compose.yml` file is configured, then run:
+   ```bash
+   docker-compose up
+   ```
 
 Before getting started, please ensure that the .env file is properly configured. The .env.example file has been provided for your reference, with examples of environment variables to be listed.
 
