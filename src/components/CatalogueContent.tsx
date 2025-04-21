@@ -29,26 +29,17 @@ export async function downloadFile(url: string, filename: string) {
 const CatalogueContent = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const subject = searchParams.get("subject");
-  const exams = searchParams.get("exams")?.split(",");
-  const slots = searchParams.get("slots")?.split(",");
-  const years = searchParams.get("years")?.split(",");
-  const campuses = searchParams.get("campus")?.split(",");
-  const semesters = searchParams.get("semester")?.split(",");
-  const answerKeyIncluded =
-    searchParams.get("answerkey") === "true" ? true : false;
-  // Initialize state with searchParams
-  const [selectedExams, setSelectedExams] = useState<string[]>(exams ?? []);
-  const [selectedSlots, setSelectedSlots] = useState<string[]>(slots ?? []);
-  const [selectedYears, setSelectedYears] = useState<string[]>(years ?? []);
-  const [selectedSemesters, setSelectedSemesters] = useState<string[]>(
-    semesters ?? [],
-  );
-  const [selectedCampuses, setSelectedCampuses] = useState<string[]>(
-    campuses ?? [],
-  );
+  const [isMounted, setIsMounted] = useState(false);
+
+  // Initialize state with defaults, set later in useEffect
+  const [subject, setSubject] = useState<string | null>(null);
+  const [selectedExams, setSelectedExams] = useState<string[]>([]);
+  const [selectedSlots, setSelectedSlots] = useState<string[]>([]);
+  const [selectedYears, setSelectedYears] = useState<string[]>([]);
+  const [selectedSemesters, setSelectedSemesters] = useState<string[]>([]);
+  const [selectedCampuses, setSelectedCampuses] = useState<string[]>([]);
   const [selectedAnswerKeyIncluded, setSelectedAnswerKeyIncluded] =
-    useState<boolean>(answerKeyIncluded);
+    useState<boolean>(false);
   const [papers, setPapers] = useState<IPaper[]>([]);
   const [filteredPapers, setFilteredPapers] = useState<IPaper[]>([]);
   const [selectedPapers, setSelectedPapers] = useState<IPaper[]>([]);
@@ -58,12 +49,27 @@ const CatalogueContent = () => {
   const [filtersPulled, setFiltersPulled] = useState<boolean>(false);
   const [appliedFilters, setAppliedFilters] = useState<boolean>(false);
 
+  // Set initial state from searchParams on client-side mount
+  useEffect(() => {
+    setIsMounted(true);
+    if (searchParams) {
+      setSubject(searchParams.get("subject"));
+      setSelectedExams(searchParams.get("exams")?.split(",") ?? []);
+      setSelectedSlots(searchParams.get("slots")?.split(",") ?? []);
+      setSelectedYears(searchParams.get("years")?.split(",") ?? []);
+      setSelectedCampuses(searchParams.get("campus")?.split(",") ?? []);
+      setSelectedSemesters(searchParams.get("semester")?.split(",") ?? []);
+      setSelectedAnswerKeyIncluded(searchParams.get("answerkey") === "true");
+    }
+  }, [searchParams]);
+
   const filtersNotPulled = () => {
     setFiltersPulled(false);
   };
-  // Memoized effect to fetch papers
+
+  // Fetch papers and apply filters
   useEffect(() => {
-    if (!subject) return;
+    if (!subject || !isMounted) return;
 
     const fetchPapers = async () => {
       setLoading(true);
@@ -75,6 +81,7 @@ const CatalogueContent = () => {
         const papersData = data.papers;
         setFilterOptions(data);
         setPapers(papersData);
+        // Apply filters from URL params
         const filtered = papersData.filter((paper) => {
           const examCondition = selectedExams.length
             ? selectedExams.includes(paper.exam)
@@ -104,23 +111,32 @@ const CatalogueContent = () => {
           );
         });
         setFilteredPapers(filtered.length > 0 ? filtered : papersData);
+        setAppliedFilters(true);
       } catch (error) {
         setPapers([]);
-        if (axios.isAxiosError(error)) {
-          const axiosError = error as AxiosError<{ message?: string }>;
-          setError(
-            axiosError.response?.data?.message ?? "Error fetching papers",
-          );
-        } else {
-          setError("Error fetching papers");
-        }
+        const axiosError = error as AxiosError;
+        setError(
+          axios.isAxiosError(axiosError)
+            ? ((axiosError.response?.data as { message?: string })?.message ??
+                "Error fetching papers")
+            : "Error fetching papers",
+        );
       } finally {
         setLoading(false);
       }
     };
 
     void fetchPapers();
-  }, [subject]); // Just run on initial page render
+  }, [
+    subject,
+    isMounted,
+    selectedExams,
+    selectedSlots,
+    selectedYears,
+    selectedSemesters,
+    selectedCampuses,
+    selectedAnswerKeyIncluded,
+  ]);
 
   // Memoized handlers
   const handleSelectPaper = useCallback(
@@ -213,6 +229,11 @@ const CatalogueContent = () => {
     setSelectedPapers([]);
   }, []);
 
+  // Render loading state until mounted to avoid hydration mismatch
+  if (!isMounted) {
+    return <Loader />;
+  }
+
   return (
     <div className="relative flex min-h-screen justify-center p-0 md:justify-normal">
       <div className="hidden w-[30%] min-w-fit md:block">
@@ -237,7 +258,6 @@ const CatalogueContent = () => {
         />
       </div>
 
-      {/* {error && <p className="text-red-500">{error}</p>} */}
       <div className="w-full">
         <Sheet>
           <SheetTrigger className="mx-8 mt-8 block md:hidden">
