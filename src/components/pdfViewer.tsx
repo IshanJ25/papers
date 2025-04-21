@@ -4,7 +4,7 @@ import "react-pdf/dist/Page/AnnotationLayer.css";
 import "react-pdf/dist/Page/TextLayer.css";
 import { useState, useRef, useCallback, useEffect } from "react";
 import { Document, Page, pdfjs } from "react-pdf";
-import { Download, ZoomIn, ZoomOut } from "lucide-react";
+import { Download, ZoomIn, ZoomOut, Maximize2, Minimize2 } from "lucide-react";
 import { Button } from "./ui/button";
 import { downloadFile } from "./CatalogueContent";
 import ShareButton from "./ShareButton";
@@ -25,6 +25,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
   const [numPages, setNumPages] = useState<number>();
   const [pageNumber, setPageNumber] = useState<number>(1);
   const [scale, setScale] = useState<number>(1);
+  const [isFullscreen, setIsFullscreen] = useState<boolean>(false);
   const pageRefs = useRef<(HTMLDivElement | null)[]>([]);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -109,14 +110,50 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
     await downloadFile(url, fileName);
   };
 
+  const toggleFullscreen = () => {
+    if (!containerRef.current) return;
+
+    if (!document.fullscreenElement) {
+      containerRef.current
+        .requestFullscreen()
+        .then(() => {
+          setIsFullscreen(true);
+        })
+        .catch((err) => {
+          console.error("Error entering fullscreen:", err);
+        });
+    } else {
+      document
+        .exitFullscreen()
+        .then(() => {
+          setIsFullscreen(false);
+        })
+        .catch((err) => {
+          console.error("Error exiting fullscreen:", err);
+        });
+    }
+  };
+
+  useEffect(() => {
+    const handleFullscreenChange = () => {
+      setIsFullscreen(!!document.fullscreenElement);
+    };
+
+    document.addEventListener("fullscreenchange", handleFullscreenChange);
+    return () => {
+      document.removeEventListener("fullscreenchange", handleFullscreenChange);
+    };
+  }, []);
+
   return (
     <div className="flex flex-col items-center">
       <div
         ref={containerRef}
-        className="max-h-[70vh] overflow-auto border border-gray-300 shadow-lg"
+        className="max-h-[70vh] w-fit overflow-auto bg-[#F3F5FF] shadow-lg dark:bg-[#070114]"
       >
         <Document
           file={url}
+          className={"w-fit"}
           onLoadSuccess={onDocumentLoadSuccess}
           error={
             <div className="p-4 text-red-500">Failed to load PDF file.</div>
@@ -150,7 +187,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
         </Document>
       </div>
 
-      <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#262635] p-4 shadow sm:flex-row">
+      <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#F3F5FF] p-4 shadow dark:bg-[#262635] sm:flex-row">
         <div className="flex items-center gap-2">
           <Button
             onClick={goToPreviousPage}
@@ -196,6 +233,12 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
           <ShareButton />
           <Button onClick={downloadPDF} className="aspect-square h-10 w-10 p-0">
             <Download />
+          </Button>
+          <Button
+            onClick={toggleFullscreen}
+            className="h-10 w-10 rounded p-0 text-white transition hover:bg-[#6536c1]"
+          >
+            {isFullscreen ? <Minimize2 /> : <Maximize2 />}
           </Button>
         </div>
       </div>
