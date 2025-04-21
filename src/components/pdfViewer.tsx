@@ -149,10 +149,11 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
     <div className="flex flex-col items-center">
       <div
         ref={containerRef}
-        className="max-h-[70vh] overflow-auto border border-gray-300 shadow-lg"
+        className="max-h-[70vh] w-fit overflow-auto bg-[#F3F5FF] shadow-lg dark:bg-[#070114]"
       >
         <Document
           file={url}
+          className={"w-fit"}
           onLoadSuccess={onDocumentLoadSuccess}
           error={
             <div className="p-4 text-red-500">Failed to load PDF file.</div>
@@ -186,7 +187,7 @@ export default function PdfViewer({ url, name }: PdfViewerProps) {
         </Document>
       </div>
 
-      <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#262635] p-4 shadow sm:flex-row">
+      <div className="mt-4 flex flex-col items-center gap-4 rounded-lg bg-[#F3F5FF] p-4 shadow dark:bg-[#262635] sm:flex-row">
         <div className="flex items-center gap-2">
           <Button
             onClick={goToPreviousPage}
