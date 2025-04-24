@@ -21,25 +21,7 @@ function SearchbarSubjectList({
   const [courses, setCourses] = useState<string[]>([]);
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
 
-  const fetchCourses = async () => {
-    try {
-      setLoading(true);
-      const response = await axios.get<ICourses[]>("/api/course-list");
-      const fetchedCourses = response.data.map(
-        (course: { name: string }) => course.name,
-      );
-      setCourses(fetchedCourses);
-      setLoading(false);
-    } catch (err) {
-      console.error("Error fetching courses:", err);
-      setError("Failed to fetch courses");
-      setLoading(false);
-    }
-  };
 
-  useEffect(() => {
-    void fetchCourses();
-  }, []);
 
   const debouncedSearch = useCallback(
     debounce((text: string) => {
