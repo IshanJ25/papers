@@ -5,7 +5,7 @@ import Link from "next/link";
 
 export default function Banner() {
   return (
-    <div className="z-50 flex h-fit w-full items-center justify-center bg-[#434dba] px-6 py-3 text-center text-white sm:h-14 sm:py-0 md:sticky md:top-0 md:justify-between md:text-left">
+    <div className="z-50 flex h-fit w-full items-center justify-center bg-[#ba4343] px-6 py-3 text-center text-white sm:h-14 sm:py-0 md:sticky md:top-0 md:justify-between md:text-left">
       <div className="flex items-center gap-x-2">
         <Image
           src={devsoc as HTMLImageElement}
@@ -15,8 +15,7 @@ export default function Banner() {
           className="md:hidden"
         />
         <span className="hidden md:block">
-          Register for DevSOC&apos;25 and enjoy a 3 day full OD to unwind after
-          CATs!
+          Site is under maintenance!
         </span>
         <Link
           href="https://devsoc.codechefvit.com/"
