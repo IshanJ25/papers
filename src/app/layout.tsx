@@ -119,7 +119,6 @@ export default function RootLayout({
           enableSystem
           disableTransitionOnChange
         >
-          <Banner />
           <Toaster position="top-right" reverseOrder={false} />
           <div className="bg-[#F3F5FF] dark:bg-[#070114]">
             <Navbar />
