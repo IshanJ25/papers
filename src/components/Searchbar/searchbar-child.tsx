@@ -44,15 +44,6 @@ function SearchBarChild({
         .map((item) => item.item)
         .slice(0, 10);
 
-      // add paper quantity to suggestions
-      // const suggestionsWithQuantity = await Promise.all(
-      //   filteredSuggestions.map(async (suggestion) => {
-      //     console.log("Fetching paper quantity for:", suggestion);
-      //     const paperQuantity = await fetchPaperQuantityByName(suggestion);
-      //     return `${suggestion} (Papers found: ${paperQuantity})`;
-      //   }),
-      // );
-
       setSuggestions(filteredSuggestions);
     } else {
       setSuggestions([]);
@@ -76,12 +67,6 @@ function SearchBarChild({
   };
 
   useEffect(() => {
-    fetchPaperQuantityByName("Information Security [CBS3002]").catch(
-      (error) => {
-        console.error("Error fetching paper by name:", error);
-      },
-    );
-
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
