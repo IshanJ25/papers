@@ -25,9 +25,9 @@ function SearchBarChild({
       const response = await axios.get("/api/papers", {
         params: { subject: subjectName },
       });
-      return response.data.papers.length; // Assuming the API returns an array of papers
+      return response.data.papers.length;
     } catch (error) {
-      return 0; // Return 0 if there's no papers found or an error occurs
+      return 0;
     }
   };
 
