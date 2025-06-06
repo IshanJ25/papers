@@ -5,6 +5,7 @@ import { Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { Input } from "@/components/ui/input";
 import Fuse from "fuse.js";
+import axios from "axios";
 
 function SearchBarChild({
   initialSubjects,
@@ -19,7 +20,18 @@ function SearchBarChild({
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
   const fuzzy = new Fuse(initialSubjects);
 
-  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const fetchPaperQuantityByName = async (subjectName: string) => {
+    try {
+      const response = await axios.get("/api/papers", {
+        params: { subject: subjectName },
+      });
+      return response.data.papers.length;
+    } catch (error) {
+      return 0;
+    }
+  };
+
+  const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setSearchText(text);
 
@@ -62,7 +74,7 @@ function SearchBarChild({
   }, []);
 
   return (
-    <div className="font-play mx-auto w-full max-w-xl">
+    <div className="mx-auto w-full max-w-xl font-play">
       <form
         onSubmit={(e) => {
           e.preventDefault();
@@ -78,7 +90,7 @@ function SearchBarChild({
             value={searchText}
             onChange={handleSearchChange}
             placeholder="Search by subject..."
-            className={`text-md font-play rounded-lg bg-[#B2B8FF] px-4 py-6 pr-10 tracking-wider text-black shadow-sm ring-0 placeholder:text-black focus:outline-none focus:ring-0 dark:bg-[#7480FF66] dark:text-white placeholder:dark:text-white ${suggestions.length > 0 ? "rounded-b-none" : ""}`}
+            className={`text-md rounded-lg bg-[#B2B8FF] px-4 py-6 pr-10 font-play tracking-wider text-black shadow-sm ring-0 placeholder:text-black focus:outline-none focus:ring-0 dark:bg-[#7480FF66] dark:text-white placeholder:dark:text-white ${suggestions.length > 0 ? "rounded-b-none" : ""}`}
           />
           <button
             type="submit"
