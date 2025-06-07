@@ -15,19 +15,27 @@ export async function POST(req: Request) {
       subject: { $in: subjects },
     });
 
-    let transformedPapers = usersPapers.map((paper) => ({
-      subject: paper.subject,
-      slots: [paper.slot],
-    }));
+    const transformedPapers = usersPapers.reduce((acc, paper) => {
+      const existing = acc.find((item) => item.subject === paper.subject);
+
+      if (existing) {
+        existing.slots.push(paper.slot);
+      } else {
+        acc.push({ subject: paper.subject, slots: [paper.slot] });
+      }
+
+      return acc;
+    }, []);
 
     // check duplicates
-    transformedPapers = Array.from(
-      new Map(transformedPapers.map((item) => [item.subject, item])).values(),
-    );
+    const seenSubjects = new Set();
+    const uniquePapers = transformedPapers.filter((paper) => {
+      if (seenSubjects.has(paper.subject)) return false;
+      seenSubjects.add(paper.subject);
+      return true;
+    });
 
-    console.log("usersPapers", usersPapers);
-
-    return NextResponse.json(transformedPapers, {
+    return NextResponse.json(uniquePapers, {
       status: 200,
     });
   } catch (error) {

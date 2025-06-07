@@ -1,7 +1,6 @@
 import React from "react";
 import SearchBar from "../Searchbar/searchbar";
-import StoredPapers from "../StoredPapers";
-import UsersPapers from "../UsersPapers";
+import PapersCarousel from "../PapersCarousel";
 
 const Hero = () => {
   return (
@@ -12,8 +11,8 @@ const Hero = () => {
       <div className="px-6">
         <SearchBar />
       </div>
-      <UsersPapers />
-      <StoredPapers />
+      <PapersCarousel carouselType="users" />
+      <PapersCarousel carouselType="default" />
       {/* <div className="hidden lg:flex flex-col items-center whitespace-nowrap text-center">
         <h1 className="font-play text-md">Learn More</h1>
         <Link

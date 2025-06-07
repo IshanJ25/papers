@@ -25,9 +25,17 @@ function SearchBarChild({
       const response = await axios.get("/api/papers", {
         params: { subject: subjectName },
       });
-      return response.data.papers.length; // Assuming the API returns an array of papers
+
+      if (
+        response.data.message === "No papers found for the specified subject"
+      ) {
+        return 0;
+      }
+
+      return response.data.papers.length;
     } catch (error) {
-      return 0; // Return 0 if there's no papers found or an error occurs
+      console.error("Error fetching paper quantity:", error);
+      return "request-error";
     }
   };
 
@@ -44,7 +52,16 @@ function SearchBarChild({
         .map((item) => item.item)
         .slice(0, 10);
 
-      setSuggestions(filteredSuggestions);
+      const suggestionsWithCount = await Promise.all(
+        filteredSuggestions.map(async (suggestion) => {
+          const count = await fetchPaperQuantityByName(suggestion);
+          return count !== "request-error"
+            ? `${suggestion} (${count})`
+            : suggestion;
+        }),
+      );
+
+      setSuggestions(suggestionsWithCount);
     } else {
       setSuggestions([]);
     }

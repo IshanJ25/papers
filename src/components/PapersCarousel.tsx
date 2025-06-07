@@ -15,7 +15,11 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { chunkArray } from "@/util/utils";
 
-function UsersPapers() {
+function PapersCarousel({
+  carouselType,
+}: {
+  carouselType: "users" | "default";
+}) {
   const [displayPapers, setDisplayPapers] = useState<IUpcomingPaper[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [chunkSize, setChunkSize] = useState<number>(4);
@@ -53,10 +57,19 @@ function UsersPapers() {
   useEffect(() => {
     async function fetchPapers() {
       try {
-        const storedSubjects = JSON.parse(localStorage.getItem("userSubjects"));
         setIsLoading(true);
-        const response = await axios.post("/api/user-papers", storedSubjects);
-        setDisplayPapers(response.data);
+        if (carouselType === "users") {
+          const storedSubjects = JSON.parse(
+            localStorage.getItem("userSubjects"),
+          );
+          const response = await axios.post("/api/user-papers", storedSubjects);
+          setDisplayPapers(response.data);
+        } else {
+          const response = await axios.get<IUpcomingPaper[]>(
+            "/api/upcoming-papers",
+          );
+          setDisplayPapers(response.data);
+        }
       } catch (error) {
         console.error("Failed to fetch papers:", error);
       } finally {
@@ -76,7 +89,7 @@ function UsersPapers() {
   return (
     <div className="px-4">
       <p className="my-8 text-center font-play text-lg font-semibold">
-        Users Papers
+        {carouselType === "users" ? "Your Papers" : "Upcoming Papers"}
       </p>
 
       <div className="">
@@ -117,4 +130,4 @@ function UsersPapers() {
   );
 }
 
-export default UsersPapers;
+export default PapersCarousel;
