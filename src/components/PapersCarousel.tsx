@@ -15,7 +15,11 @@ import {
 import Autoplay from "embla-carousel-autoplay";
 import { chunkArray } from "@/util/utils";
 
-function StoredPapers() {
+function PapersCarousel({
+  carouselType,
+}: {
+  carouselType: "users" | "default";
+}) {
   const [displayPapers, setDisplayPapers] = useState<IUpcomingPaper[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [chunkSize, setChunkSize] = useState<number>(4);
@@ -28,6 +32,17 @@ function StoredPapers() {
         setChunkSize(8);
       }
     };
+
+    localStorage.setItem(
+      "userSubjects",
+      JSON.stringify([
+        "Information Security [CBS3002]",
+        "Foundations of Data Analytics [BCSE351E]",
+        "Design and Analysis of Algorithms [MCSE502L]",
+        "Complex Variables and Linear Algebra [BMAT201L]",
+        "Differential Equations and Transforms [BMAT102L]",
+      ]),
+    );
 
     handleResize();
     window.addEventListener("resize", handleResize);
@@ -43,10 +58,18 @@ function StoredPapers() {
     async function fetchPapers() {
       try {
         setIsLoading(true);
-        const response = await axios.get<IUpcomingPaper[]>(
-          "/api/upcoming-papers",
-        );
-        setDisplayPapers(response.data);
+        if (carouselType === "users") {
+          const storedSubjects = JSON.parse(
+            localStorage.getItem("userSubjects"),
+          );
+          const response = await axios.post("/api/user-papers", storedSubjects);
+          setDisplayPapers(response.data);
+        } else {
+          const response = await axios.get<IUpcomingPaper[]>(
+            "/api/upcoming-papers",
+          );
+          setDisplayPapers(response.data);
+        }
       } catch (error) {
         console.error("Failed to fetch papers:", error);
       } finally {
@@ -66,7 +89,7 @@ function StoredPapers() {
   return (
     <div className="px-4">
       <p className="my-8 text-center font-play text-lg font-semibold">
-        Upcoming Papers
+        {carouselType === "users" ? "Your Papers" : "Upcoming Papers"}
       </p>
 
       <div className="">
@@ -107,4 +130,4 @@ function StoredPapers() {
   );
 }
 
-export default StoredPapers;
+export default PapersCarousel;
