@@ -96,7 +96,7 @@ export default function Footer() {
             <Mail /> codechefvit@gmail.com
           </Link>
 
-          <div className="mt-4 flex flex-col gap-3 w-full max-w-xs">
+          <div className="mt-4 flex flex-col gap-2 w-full max-w-xs">
             <h3 htmlFor="email" className="font-jost text-2xl font-semibold">
               Subscribe For Updates:
             </h3>
