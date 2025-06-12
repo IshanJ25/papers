@@ -20,25 +20,6 @@ function SearchBarChild({
   const suggestionsRef = useRef<HTMLUListElement | null>(null);
   const fuzzy = new Fuse(initialSubjects);
 
-  const fetchPaperQuantityByName = async (subjectName: string) => {
-    try {
-      const response = await axios.get("/api/papers", {
-        params: { subject: subjectName },
-      });
-
-      if (
-        response.data.message === "No papers found for the specified subject"
-      ) {
-        return 0;
-      }
-
-      return response.data.papers.length;
-    } catch (error) {
-      console.error("Error fetching paper quantity:", error);
-      return "request-error";
-    }
-  };
-
   const handleSearchChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const text = e.target.value;
     setSearchText(text);
@@ -52,16 +33,7 @@ function SearchBarChild({
         .map((item) => item.item)
         .slice(0, 10);
 
-      const suggestionsWithCount = await Promise.all(
-        filteredSuggestions.map(async (suggestion) => {
-          const count = await fetchPaperQuantityByName(suggestion);
-          return count !== "request-error"
-            ? `${suggestion} (${count})`
-            : suggestion;
-        }),
-      );
-
-      setSuggestions(suggestionsWithCount);
+      setSuggestions(filteredSuggestions);
     } else {
       setSuggestions([]);
     }
