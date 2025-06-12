@@ -14,17 +14,38 @@ import {
   FaYoutube,
 } from "react-icons/fa6";
 import { Mail } from "lucide-react";
-
+import toast from "react-hot-toast";
 export default function Footer() {
   const { theme } = useTheme();
   const [isDarkMode, setIsDarkMode] = useState<boolean | null>(true);
-
+  const [email, setEmail] = useState("");
   useEffect(() => {
     if (theme) {
       setIsDarkMode(theme === "dark");
     }
   }, [theme]);
-
+  const handleSubscribe = async () => {
+    if (!email || !email.includes("@")) {
+      toast.error("Please Enter A Valid Email.");
+      return;
+    }
+  
+    const fakeSubscribe = () =>
+      new Promise((resolve, reject) => {
+        setTimeout(() => {
+          resolve("Subscribed");
+        }, 1500);
+      });
+  
+    toast.promise(fakeSubscribe(), {
+      loading: "Subscribing...",
+      success: "You've Successfully Subscribed!",
+      error: "Something Went Wrong. Please Try Again.",
+    });
+  
+    setEmail("");
+  };
+  
   return (
     <footer className="w-full overflow-hidden bg-gradient-to-b from-[#F3F5FF] to-[#A599CE] px-12 py-12 font-sans text-white dark:from-[#070114] dark:to-[#1F0234]">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-y-4 lg:flex-row lg:justify-between">
@@ -107,8 +128,11 @@ export default function Footer() {
                 type="email"
                 placeholder="Enter Your Email"
                 className="pr-24"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
               />
               <Button
+                onClick={handleSubscribe}
                 className="absolute right-0 top-0 h-full rounded-l-none rounded-r-md bg-[#562EE7] px-4 text-white hover:bg-[#4531b3]"
               >
                 Subscribe!
