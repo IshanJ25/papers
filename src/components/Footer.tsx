@@ -29,23 +29,26 @@ export default function Footer() {
       toast.error("Please Enter A Valid Email.");
       return;
     }
-  
-    const fakeSubscribe = () =>
-      new Promise((resolve, reject) => {
-        setTimeout(() => {
-          resolve("Subscribed");
-        }, 1500);
-      });
-  
-    toast.promise(fakeSubscribe(), {
-      loading: "Subscribing...",
-      success: "You've Successfully Subscribed!",
-      error: "Something Went Wrong. Please Try Again.",
-    });
-  
+
+    await toast.promise(
+      fetch("/api/subscribe", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      }).then((res) => {
+        if (!res.ok) throw new Error("Network response was not ok.");
+        return res.json();
+      }),
+      {
+        loading: "Subscribing...",
+        success: "You've Successfully Subscribed!",
+        error: "Something went wrong. Try again later.",
+      }
+    );
+
     setEmail("");
   };
-  
+
   return (
     <footer className="w-full overflow-hidden bg-gradient-to-b from-[#F3F5FF] to-[#A599CE] px-12 py-12 font-sans text-white dark:from-[#070114] dark:to-[#1F0234]">
       <div className="mx-auto flex max-w-[1440px] flex-col gap-y-4 lg:flex-row lg:justify-between">
