@@ -259,6 +259,48 @@ function SideBar({
           </AccordionItem>
         </Accordion>
       </div>
+  {/* <div className="flex w-full flex-col items-baseline justify-between border-b-2 border-[#36266d] px-[10px]">
+        <Accordion className="w-full" type="single" collapsible>
+          <AccordionItem className="border-none no-underline" value="item-1">
+            <AccordionTrigger className="w-full no-underline">
+              <div className="font-sans text-sm no-underline">Campuses</div>
+            </AccordionTrigger>
+            <AccordionContent>
+              <div className="my-2 flex w-full flex-wrap items-center">
+                {campuses?.map((campus) => (
+                  <div
+                    key={campus.value}
+                    onClick={() => {
+                      if (selectedCampuses.includes(campus.value)) {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          selectedYears,
+                          selectedCampuses.filter((c) => c !== campus.value),
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      } else {
+                        handleApplyFilters(
+                          selectedExams,
+                          selectedSlots,
+                          selectedYears,
+                          [...selectedCampuses, campus.value],
+                          selectedSemesters,
+                          selectedAnswerKeyIncluded,
+                        );
+                      }
+                    }}
+                    className={`mb-2 mr-2 flex h-fit cursor-pointer items-center rounded-full border-2 border-black px-2 py-1 font-sans text-xs font-semibold hover:bg-slate-800 hover:text-white dark:hover:bg-slate-900 ${selectedCampuses.includes(campus.value) ? "border-[#B2B8FF] bg-[#B2B8FF] hover:border-black hover:bg-[#B2B8FF] dark:border-[#434dba] dark:bg-[#434dba] dark:hover:border-[white] dark:hover:bg-[#434dba]" : "bg-none hover:bg-[#B2B8FF] dark:border-white dark:hover:border-[#434dba]"}`}
+                  >
+                    {campus.label}
+                  </div>
+                ))}
+              </div>
+            </AccordionContent>
+          </AccordionItem>
+        </Accordion>
+      </div> */}
     </div>
   );
 }
