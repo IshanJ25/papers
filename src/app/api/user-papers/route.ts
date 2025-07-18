@@ -1,33 +1,36 @@
 import { NextResponse } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import Paper from "@/db/papers";
+import { StoredSubjects } from "@/interface";
 
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    const body = await req.json();
+    const body = (await req.json()) as StoredSubjects;
 
-    const subjects: string[] = body;
+    const subjects = body;
 
     const usersPapers = await Paper.find({
       subject: { $in: subjects },
     });
 
-    const transformedPapers = usersPapers.reduce((acc, paper) => {
-      const existing = acc.find((item) => item.subject === paper.subject);
+    const transformedPapers = usersPapers.reduce(
+      (acc: { subject: string; slots: string[] }[], paper) => {
+        const existing = acc.find((item) => item.subject === paper.subject);
 
-      if (existing) {
-        existing.slots.push(paper.slot);
-      } else {
-        acc.push({ subject: paper.subject, slots: [paper.slot] });
-      }
+        if (existing) {
+          existing.slots.push(paper.slot);
+        } else {
+          acc.push({ subject: paper.subject, slots: [paper.slot] });
+        }
 
-      return acc;
-    }, []);
+        return acc;
+      },
+      [],
+    );
 
-    // check duplicates
     const seenSubjects = new Set();
     const uniquePapers = transformedPapers.filter((paper) => {
       if (seenSubjects.has(paper.subject)) return false;

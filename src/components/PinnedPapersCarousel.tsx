@@ -12,10 +12,16 @@ import {
   CarouselNext,
   CarouselPrevious,
 } from "@/components/ui/carousel";
+import AddPapers from "./AddPapers";
 import Autoplay from "embla-carousel-autoplay";
 import { chunkArray } from "@/util/utils";
+import { StoredSubjects } from "@/interface";
 
-function PapersCarousel() {
+function PinnedPapersCarousel({
+  carouselType = "upcoming",
+}: {
+  carouselType: "users" | "upcoming";
+}) {
   const [displayPapers, setDisplayPapers] = useState<IUpcomingPaper[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [chunkSize, setChunkSize] = useState<number>(4);
@@ -39,22 +45,58 @@ function PapersCarousel() {
 
   const chunkedPapers = chunkArray(displayPapers, chunkSize);
 
-  useEffect(() => {
-    async function fetchPapers() {
-      try {
-        setIsLoading(true);
-        const response = await axios.get<IUpcomingPaper[]>(
-          "/api/upcoming-papers",
-        );
-        setDisplayPapers(response.data);
-      } catch (error) {
-        console.error("Failed to fetch papers:", error);
-      } finally {
-        setIsLoading(false);
-      }
-    }
+  const fetchPapers = async () => {
+    try {
+      setIsLoading(true);
 
+      const storedSubjects = JSON.parse(
+        localStorage.getItem("userSubjects") ?? "[]",
+      ) as StoredSubjects;
+
+      const response = await axios.post<{ subject: string; slots: string[] }[]>(
+        "/api/user-papers",
+        storedSubjects,
+      );
+      const fetchedPapers = response.data;
+
+      const fetchedSubjectsSet = new Set(
+        fetchedPapers.map((paper) => paper.subject),
+      );
+
+      const storedSubjectsArray = Array.isArray(storedSubjects)
+        ? storedSubjects
+        : [];
+      const missingSubjects = storedSubjectsArray
+        .filter((subject: string) => !fetchedSubjectsSet.has(subject))
+        .map((subject: string) => ({
+          subject,
+          slots: [],
+        })) as { subject: string; slots: string[] }[];
+
+      const allDisplayPapers = [...fetchedPapers, ...missingSubjects];
+
+      setDisplayPapers(allDisplayPapers);
+    } catch (error) {
+      console.error("Failed to fetch papers:", error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
     void fetchPapers();
+  }, []);
+
+  useEffect(() => {
+    const handleSubjectsChange = () => {
+      void fetchPapers();
+    };
+
+    window.addEventListener("userSubjectsChanged", handleSubjectsChange);
+
+    return () => {
+      window.removeEventListener("userSubjectsChanged", handleSubjectsChange);
+    };
   }, []);
 
   if (isLoading) {
@@ -65,10 +107,6 @@ function PapersCarousel() {
 
   return (
     <div className="px-4">
-      <p className="my-8 text-center font-play text-lg font-semibold">
-        Upcoming Papers
-      </p>
-
       <div className="">
         <Carousel
           opts={{
@@ -84,6 +122,8 @@ function PapersCarousel() {
           </div>
           <CarouselContent>
             {chunkedPapers.map((paperGroup, index) => {
+              const isLastChunk = index === chunkedPapers.length - 1;
+
               return (
                 <CarouselItem
                   key={`carousel-item-${index}`}
@@ -97,6 +137,12 @@ function PapersCarousel() {
                       />
                     </div>
                   ))}
+
+                  {isLastChunk && displayPapers.length < 8 && (
+                    <div className="h-full">
+                      <AddPapers />
+                    </div>
+                  )}
                 </CarouselItem>
               );
             })}
@@ -107,4 +153,4 @@ function PapersCarousel() {
   );
 }
 
-export default PapersCarousel;
+export default PinnedPapersCarousel;

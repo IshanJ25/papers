@@ -79,15 +79,19 @@ export interface IAdminPaper {
   slot: string;
   year: string;
   exam: "CAT-1" | "CAT-2" | "FAT" | "Model";
-  semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
+  semester:
+    | "Fall Semester"
+    | "Winter Semester"
+    | "Summer Semester"
+    | "Weekend Semester";
   cloudinary_index: number;
   campus:
-  | "Vellore"
-  | "Chennai"
-  | "Andhra Pradesh"
-  | "Bhopal"
-  | "Bangalore"
-  | "Mauritius";
+    | "Vellore"
+    | "Chennai"
+    | "Andhra Pradesh"
+    | "Bhopal"
+    | "Bangalore"
+    | "Mauritius";
   answerKeyIncluded?: boolean;
   isSelected?: boolean;
 }
@@ -146,14 +150,18 @@ export interface IPaper {
   exam: "CAT-1" | "CAT-2" | "FAT" | "Model CAT-1" | "Model CAT-2" | "Model FAT";
   finalUrl: string;
   thumbnailUrl: string;
-  semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
+  semester:
+    | "Fall Semester"
+    | "Winter Semester"
+    | "Summer Semester"
+    | "Weekend Semester";
   campus:
-  | "Vellore"
-  | "Chennai"
-  | "Andhra Pradesh"
-  | "Bhopal"
-  | "Bangalore"
-  | "Mauritius";
+    | "Vellore"
+    | "Chennai"
+    | "Andhra Pradesh"
+    | "Bhopal"
+    | "Bangalore"
+    | "Mauritius";
   slot: string;
   subject: string;
   year: string;
@@ -163,8 +171,12 @@ export type ExamDetail = {
   subject: string;
   slot: string;
   "course-code": string;
-  "exam": string;
-  semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
+  exam: string;
+  semester:
+    | "Fall Semester"
+    | "Winter Semester"
+    | "Summer Semester"
+    | "Weekend Semester";
   year: string;
   answerKeyIncluded: boolean | undefined;
 };
@@ -175,4 +187,8 @@ export interface Filters {
   uniqueYears: string[];
   uniqueCampuses: string[];
   uniqueSemesters: string[];
+}
+
+export interface StoredSubjects {
+  subjects: string[];
 }
