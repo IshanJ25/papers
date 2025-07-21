@@ -6,12 +6,24 @@ import ModeToggle from "@/components/toggle-theme";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { ArrowDownLeftIcon } from "lucide-react";
+import SearchbarChild from "./Searchbar/searchbar-child";
+import { fetchSubjects } from "./Searchbar/searchbar";
+import { useEffect, useState } from "react";
 
 function Navbar() {
   const pathname = usePathname();
+  const [subjects, setSubjects] = useState<string[]>([]);
+
+  useEffect(() => {
+    const getSubjects = async () => {
+      const subs = await fetchSubjects();
+      setSubjects(subs);
+    };
+    getSubjects();
+  }, []);
 
   return (
-    <div className="sticky top-0 z-10 flex h-[85px] w-full items-center justify-between gap-x-3 overflow-hidden bg-[#B2B8FF] px-2 py-6 dark:bg-[#130E1F] md:px-12">
+    <div className="sticky top-0 z-10 flex h-[85px] w-full items-center justify-between gap-x-3 bg-[#B2B8FF] px-2 py-6 dark:bg-[#130E1F] md:px-12">
       <div className="flex items-center gap-x-2 md:w-auto">
         <a
           href="https://www.codechefvit.com/"
@@ -32,6 +44,15 @@ function Navbar() {
           Papers
         </Link>
       </div>
+
+      {pathname === "/catalogue" && (
+        <div className="hidden flex-1 justify-center md:flex">
+          <div className="w-[60%] max-w-[500px]">
+            <SearchbarChild initialSubjects={subjects} />
+          </div>
+        </div>
+      )}
+
       <div className="md:w/[20%] flex items-center justify-end gap-x-2">
         <div className="scale-75 sm:scale-100">
           <ModeToggle />
