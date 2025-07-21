@@ -8,9 +8,7 @@ export const dynamic = "force-dynamic";
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    const body = (await req.json()) as StoredSubjects;
-
-    const subjects = body;
+    const subjects = (await req.json()) as StoredSubjects;
 
     const usersPapers = await Paper.find({
       subject: { $in: subjects },

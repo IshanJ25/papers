@@ -29,7 +29,7 @@ export async function GET(req: NextRequest) {
     if (papers.length === 0) {
       return NextResponse.json(
         { message: "No papers found for the specified subject" },
-        { status: 200 },
+        { status: 404 },
       );
     }
 
