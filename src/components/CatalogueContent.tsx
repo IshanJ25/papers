@@ -198,7 +198,7 @@ const CatalogueContent = () => {
         const campusCondition = campus.length
           ? campus.includes(paper.campus)
           : true;
-        const answerkeyCondition = anskey ? paper.answerKeyIncluded : true;
+        const answerkeyCondition = anskey ? paper.answerKeyIncluded ===true : true;
         return (
           examCondition &&
           slotCondition &&
