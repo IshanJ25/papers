@@ -10,7 +10,7 @@ function Info() {
       className="flex scroll-mt-24 flex-col items-center justify-between px-6 py-12 md:scroll-mt-32 lg:flex-row"
     >
       <div className="w-full text-center lg:w-[50%] lg:text-left">
-        <div className="font-vipnabd mb-8 block text-3xl font-extrabold text-black dark:text-white lg:text-5xl">
+        <div className="mb-8 hidden font-vipnabd text-3xl font-extrabold text-black dark:text-white lg:block lg:text-5xl">
           <span>Prepare to excel in </span>
           <span>your CATs and FATs </span>
           <span>with CodeChef-</span>
@@ -18,19 +18,34 @@ function Info() {
           <span>repository of past </span>
           <span>exam papers</span>
         </div>
-        <div className="font-play grid gap-4 text-[12px] text-black dark:text-white md:grid-cols-3 xl:text-[16px]">
-          <FeatureCard icon={<User size={32} />} text="No Sign-up required" />
-          <FeatureCard
-            isHighlight
-            highlightText="1200+"
-            subText="Past Year Papers"
-          />
-          <FeatureCard
-            icon={<Download size={32} />}
-            text="Flexible Downloads"
-          />
-          <FeatureCard icon={<Check size={32} />} text="Answer Key Available" />
-          <FeatureCard icon={<Filter size={32} />} text="Filtered Search" />
+        <div className="w-full">
+          <div className="w-full">
+            <div className="origin-top-left">
+              <div className="grid grid-cols-3 gap-2 overflow-hidden font-play text-xs text-black dark:text-white sm:text-sm lg:gap-4 lg:text-lg xl:text-base">
+                <FeatureCard
+                  icon={<User size={24} />}
+                  text="No Sign-up required"
+                />
+                <FeatureCard
+                  isHighlight
+                  highlightText="1200+"
+                  subText="Past Year Papers"
+                />
+                <FeatureCard
+                  icon={<Download size={24} />}
+                  text="Flexible Downloads"
+                />
+                <FeatureCard
+                  icon={<Check size={24} />}
+                  text="Answer Key Available"
+                />
+                <FeatureCard
+                  icon={<Filter size={24} />}
+                  text="Filtered Search"
+                />
+              </div>
+            </div>
+          </div>
         </div>
       </div>
       <div className="mb-10 hidden h-[450px] w-[450px] justify-center p-5 lg:flex lg:h-[600px] lg:w-[500px]">
@@ -72,20 +87,24 @@ const FeatureCard: React.FC<FeatureCardProps> = ({
 }) => {
   if (isHighlight) {
     return (
-      <div className="row-span-2 flex items-center gap-2 rounded-lg border-2 border-[#7480FF8A] bg-[#EAEEFF] p-4 text-center dark:border-[#453D60] dark:bg-[#130E20] md:flex-col md:justify-center">
+      <div className="row-span-2 flex flex-col items-center justify-center gap-2 rounded-lg border-2 border-[#7480FF8A] bg-[#EAEEFF] p-4 text-center dark:border-[#453D60] dark:bg-[#130E20]">
         <Book className="md:hidden" />
-        <span className="text-base text-black dark:text-white md:p-3 md:text-4xl md:font-extrabold xl:text-5xl">
+        <span className="text-xl font-bold text-black dark:text-white sm:text-3xl xl:text-5xl">
           {highlightText}
         </span>
-        <span className="text-base text-black dark:text-white">{subText}</span>
+        <span className="break-words text-[10px] leading-tight text-black dark:text-white sm:text-sm">
+          {subText}
+        </span>
       </div>
     );
   }
 
   return (
-    <div className="flex flex-row items-center gap-2 rounded-lg border-2 border-[#7480FF8A] bg-[#EAEEFF] p-4 text-center dark:border-[#453D60] dark:bg-[#130E20]">
-      {icon}
-      <span className="text-base text-black dark:text-white">{text}</span>
+    <div className="flex items-center gap-2 rounded-lg border-2 border-[#7480FF8A] bg-[#EAEEFF] p-2 text-left dark:border-[#453D60] dark:bg-[#130E20] sm:p-3">
+      <div className="shrink-0 pt-[1px]">{icon}</div>
+      <span className="min-w-0 flex-1 break-words text-[10px] leading-snug text-black dark:text-white sm:text-xs sm:leading-tight">
+        {text}
+      </span>
     </div>
   );
 };

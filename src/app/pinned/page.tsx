@@ -4,13 +4,13 @@ import PinnedPapersCarousel from "@/components/PinnedPapersCarousel";
 
 const Pinned = () => {
   return (
-    <div id="pinned" className="flex flex-col justify-between">
-      <h1 className="mx-auto my-8 text-center font-vipnabd text-3xl font-extrabold">
+    <div id="pinned" className="mt-5 flex flex-col justify-between">
+      <h1 className="mx-auto my-8 hidden text-center font-vipnabd text-3xl font-extrabold md:block">
         Pinned Papers
       </h1>
 
-      <div className="flex items-center justify-center gap-4 px-6">
-        <div className="flex max-w-xl flex-1">
+      <div className="mb-3 flex w-full flex-col items-center gap-2 px-6">
+        <div className="w-full">
           <SearchBar type="pinned" />
         </div>
       </div>
