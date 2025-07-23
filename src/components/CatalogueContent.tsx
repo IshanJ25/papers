@@ -149,12 +149,20 @@ const CatalogueContent = () => {
   );
 
   const handleDownloadAll = useCallback(async () => {
+    if (typeof window !== "undefined" && window.gtag) {
+      window.gtag("event", "download_all_clicked", {
+        event_category: "Paper Downloads",
+        event_label: "Download All Clicked",
+      });
+    }
+
     for (const paper of selectedPapers) {
       const extension = paper.finalUrl.split(".").pop();
       const fileName = `${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}.${extension}`;
       await downloadFile(paper.finalUrl, fileName);
     }
   }, [selectedPapers]);
+
 
   const handleApplyFilters = useCallback(
     (
@@ -198,7 +206,7 @@ const CatalogueContent = () => {
         const campusCondition = campus.length
           ? campus.includes(paper.campus)
           : true;
-        const answerkeyCondition = anskey ? paper.answerKeyIncluded ===true : true;
+        const answerkeyCondition = anskey ? paper.answerKeyIncluded === true : true;
         return (
           examCondition &&
           slotCondition &&
