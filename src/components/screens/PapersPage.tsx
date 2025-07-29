@@ -40,9 +40,16 @@ export default function PapersPage() {
             setSuggestions([])
             return
         }
+
+        if (selectedSubject && searchText === selectedSubject) {
+            setSuggestions([])
+            return
+        }
+
         const results = fuse.search(searchText)
         setSuggestions(results.map(r => r.item).slice(0, 10))
-    }, [searchText, fuse])
+    }, [searchText, fuse, selectedSubject])
+
 
     const handleSelectSubject = (subject: string) => {
         setSelectedSubject(subject)
