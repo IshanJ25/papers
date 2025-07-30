@@ -57,7 +57,7 @@ function Faq() {
     <>
       <div
         id="faq"
-        className="font-vipnabd mb-8 w-full px-6 text-center text-4xl font-bold text-[#120020] dark:text-white lg:text-left lg:text-5xl"
+        className="font-vipnabd mb-8 w-full px-6 pt-16 text-center text-4xl font-bold text-[#120020] dark:text-white lg:text-left lg:text-5xl"
       >
         Frequently Asked Questions
       </div>
