@@ -4,6 +4,8 @@ import man from "@/assets/man.svg" assert { type: "image/svg" };
 import man1 from "@/assets/man1.svg" assert { type: "image/svg" };
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
+import PWAInstallButton from "../ui/PWAInstallButton";
+
 
 function Info() {
   return (
@@ -66,6 +68,9 @@ function Info() {
           </Button>
         </Link>
       </section>
+      <div className="flex justify-center py-4 z-50">
+  <PWAInstallButton />
+</div>
     </>
   );
 }
