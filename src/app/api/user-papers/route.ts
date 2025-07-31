@@ -12,23 +12,26 @@ interface TransformedPaper {
 export async function POST(req: Request) {
   try {
     await connectToDatabase();
-    const subjects: string[] = await req.json() as string[];
+    const subjects: string[] = (await req.json()) as string[];
 
     const usersPapers = await Paper.find({
       subject: { $in: subjects },
     });
 
-    const transformedPapers = usersPapers.reduce<TransformedPaper[]>((acc, paper) => {
-      const existing = acc.find((item) => item.subject === paper.subject);
+    const transformedPapers = usersPapers.reduce<TransformedPaper[]>(
+      (acc, paper) => {
+        const existing = acc.find((item) => item.subject === paper.subject);
 
-      if (existing) {
-        existing.slots.push(paper.slot);
-      } else {
-        acc.push({ subject: paper.subject, slots: [paper.slot] });
-      }
+        if (existing) {
+          existing.slots.push(paper.slot);
+        } else {
+          acc.push({ subject: paper.subject, slots: [paper.slot] });
+        }
 
-      return acc;
-    }, []);
+        return acc;
+      },
+      [],
+    );
 
     return NextResponse.json(transformedPapers, {
       status: 200,
