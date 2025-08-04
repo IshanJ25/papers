@@ -35,9 +35,7 @@ export default function PapersPage() {
   useEffect(() => {
     async function fetchSubjects() {
       try {
-        const response = await axios.get<Course[]>(
-          `${process.env.NEXT_PUBLIC_SERVER_URL}/api/course-list`,
-        );
+        const response = await axios.get<Course[]>(`/api/course-list`);
         const courses: Course[] = response.data;
         const names = courses
           .map((course) => course.name ?? course.courseName ?? course.title)
@@ -177,7 +175,7 @@ export default function PapersPage() {
             <Select
               onValueChange={setSelectedExam}
               disabled={!selectedSubject}
-              value={selectedExam || undefined}
+              value={selectedExam ?? undefined}
             >
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Exam" />
@@ -193,7 +191,7 @@ export default function PapersPage() {
             <Select
               onValueChange={setSelectedSlot}
               disabled={!selectedSubject}
-              value={selectedSlot || undefined}
+              value={selectedSlot ?? undefined}
             >
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Slot" />
@@ -209,7 +207,7 @@ export default function PapersPage() {
             <Select
               onValueChange={setSelectedYear}
               disabled={!selectedSubject}
-              value={selectedYear || undefined}
+              value={selectedYear ?? undefined}
             >
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Year" />

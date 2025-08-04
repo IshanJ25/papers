@@ -171,13 +171,8 @@ export interface IPaper {
     | "Andhra Pradesh"
     | "Bhopal"
     | "Bangalore"
-    | "Mauritius";
-    | "Vellore"
-    | "Chennai"
-    | "Andhra Pradesh"
-    | "Bhopal"
-    | "Bangalore"
-    | "Mauritius";
+    | "Mauritius"
+    | null;
   slot: string;
   subject: string;
   year: string;
@@ -188,12 +183,6 @@ export type ExamDetail = {
   subject: string;
   slot: string;
   "course-code": string;
-  exam: string;
-  semester:
-    | "Fall Semester"
-    | "Winter Semester"
-    | "Summer Semester"
-    | "Weekend Semester";
   exam: string;
   semester:
     | "Fall Semester"
@@ -211,4 +200,8 @@ export interface Filters {
   unique_years: string[];
   unique_campuses: string[];
   unique_semesters: string[];
+}
+
+export interface StoredSubjects {
+  subjects: string[];
 }

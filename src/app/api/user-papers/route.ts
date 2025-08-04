@@ -39,7 +39,7 @@ export async function POST(req: Request) {
       [],
     );
 
-    return NextResponse.json(uniquePapers, {
+    return NextResponse.json(transformedPapers, {
       status: 200,
     });
   } catch (error) {
