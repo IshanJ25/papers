@@ -50,7 +50,6 @@ export default function PapersPage() {
         setSuggestions(results.map(r => r.item).slice(0, 10))
     }, [searchText, fuse, selectedSubject])
 
-
     const handleSelectSubject = (subject: string) => {
         setSelectedSubject(subject)
         setSearchText(subject)
@@ -70,19 +69,40 @@ export default function PapersPage() {
         return () => document.removeEventListener("mousedown", handleClickOutside)
     }, [])
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
         if (!selectedSubject || !selectedExam || !selectedSlot || !selectedYear) {
-            alert("Please fill all fields before submitting")
+            alert("⚠️ Please fill all fields before submitting.")
             return
         }
-        console.log({ subject: selectedSubject, exam: selectedExam, slot: selectedSlot, year: selectedYear })
+
+        try {
+            await axios.post("/api/request", {
+                subject: selectedSubject,
+                exam: selectedExam,
+                slot: selectedSlot,
+                year: selectedYear,
+            })
+
+            alert("✅ Your paper request was submitted successfully 🎉")
+
+            setSearchText("")
+            setSelectedSubject(null)
+            setSelectedExam(null)
+            setSelectedSlot(null)
+            setSelectedYear(null)
+        } catch (error) {
+            console.error("Error submitting request:", error)
+            alert("❌ Failed to submit your request. Please try again later.")
+        }
     }
 
     return (
         <div className="min-h-screen bg-[#F3F5FF] dark:bg-[#070114] text-black dark:text-white px-6 py-12">
             <main>
                 <div className="max-w-4xl mx-auto text-center mb-16">
-                    <h2 className="font-vipnabd text-3xl md:text-4xl font-extrabold mb-12">Specific Paper Request</h2>
+                    <h2 className="font-vipnabd text-3xl md:text-4xl font-extrabold mb-12">
+                        Specific Paper Request
+                    </h2>
 
                     <div className="relative max-w-xl mx-auto mb-8 font-play">
                         <Input
@@ -101,9 +121,14 @@ export default function PapersPage() {
                             </svg>
                         </button>
                         {suggestions.length > 0 && (
-                            <ul ref={suggestionsRef} className="absolute z-20 max-h-[250px] w-full max-w-xl overflow-y-auto rounded-md rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771]">
+                            <ul
+                                ref={suggestionsRef}
+                                className="absolute z-20 max-h-[250px] w-full max-w-xl overflow-y-auto rounded-md rounded-t-none border border-t-0 bg-white text-center shadow-lg dark:bg-[#303771]">
                                 {suggestions.map((s, idx) => (
-                                    <li key={idx} onClick={() => handleSelectSubject(s)} className="cursor-pointer truncate p-2 hover:bg-gray-100 dark:hover:bg-gray-800">
+                                    <li
+                                        key={idx}
+                                        onClick={() => handleSelectSubject(s)}
+                                        className="cursor-pointer truncate p-2 hover:bg-gray-100 dark:hover:bg-gray-800">
                                         {s}
                                     </li>
                                 ))}
@@ -112,40 +137,53 @@ export default function PapersPage() {
                     </div>
 
                     <div className="flex justify-center gap-4 mb-8">
-                        <Select onValueChange={setSelectedExam} disabled={!selectedSubject}>
+                        <Select onValueChange={setSelectedExam} disabled={!selectedSubject} value={selectedExam || undefined}>
                             <SelectTrigger className="w-32"><SelectValue placeholder="Exam" /></SelectTrigger>
-                            <SelectContent>{exams.map((exam) => <SelectItem key={exam} value={exam}>{exam}</SelectItem>)}</SelectContent>
+                            <SelectContent>
+                                {exams.map((exam) => (
+                                    <SelectItem key={exam} value={exam}>{exam}</SelectItem>
+                                ))}
+                            </SelectContent>
                         </Select>
-                        <Select onValueChange={setSelectedSlot} disabled={!selectedSubject}>
+                        <Select onValueChange={setSelectedSlot} disabled={!selectedSubject} value={selectedSlot || undefined}>
                             <SelectTrigger className="w-32"><SelectValue placeholder="Slot" /></SelectTrigger>
-                            <SelectContent>{slots.map((slot) => <SelectItem key={slot} value={slot}>{slot}</SelectItem>)}</SelectContent>
+                            <SelectContent>
+                                {slots.map((slot) => (
+                                    <SelectItem key={slot} value={slot}>{slot}</SelectItem>
+                                ))}
+                            </SelectContent>
                         </Select>
-                        <Select onValueChange={setSelectedYear} disabled={!selectedSubject}>
+                        <Select onValueChange={setSelectedYear} disabled={!selectedSubject} value={selectedYear || undefined}>
                             <SelectTrigger className="w-32"><SelectValue placeholder="Year" /></SelectTrigger>
                             <SelectContent>
                                 {[...years].sort((a, b) => Number(b) - Number(a)).map((year) => (
                                     <SelectItem key={year} value={year}>{year}</SelectItem>
                                 ))}
                             </SelectContent>
-
                         </Select>
                     </div>
 
-                    <Button className="px-8 py-3 rounded-lg text-base bg-[#4A55FF] hover:bg-[#3A44CC] text-white dark:bg-[#9EA8FF] dark:hover:bg-[#7D86E5] dark:text-black" onClick={handleSubmit}>Submit</Button>
+                    <Button
+                        className="px-8 py-3 rounded-lg text-base bg-[#4A55FF] hover:bg-[#3A44CC] text-white dark:bg-[#9EA8FF] dark:hover:bg-[#7D86E5] dark:text-black"
+                        onClick={handleSubmit}
+                    >
+                        Submit
+                    </Button>
                 </div>
 
-                { }
                 <div className="max-w-6xl mx-auto mt-16 text-center">
                     <div className="relative mb-8 text-center">
                         <h3 className="font-vipnabd text-2xl font-bold">Explore More</h3>
                         <div className="absolute right-0 top-1/2 -translate-y-1/2">
-                            <Button variant="outline" className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800">
+                            <Button
+                                variant="outline"
+                                className="border-gray-300 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800"
+                            >
                                 View All
                                 <ArrowRight className="w-4 h-4 ml-2" />
                             </Button>
                         </div>
                     </div>
-
 
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 justify-center">
                         {[1, 2, 3, 4].map((index) => (
