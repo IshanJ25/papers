@@ -93,17 +93,31 @@ export default function PapersPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     if (!selectedSubject || !selectedExam || !selectedSlot || !selectedYear) {
-      alert("Please fill all fields before submitting");
+      alert("⚠️ Please fill all fields before submitting.");
       return;
     }
-    console.log({
-      subject: selectedSubject,
-      exam: selectedExam,
-      slot: selectedSlot,
-      year: selectedYear,
-    });
+
+    try {
+      await axios.post("/api/request", {
+        subject: selectedSubject,
+        exam: selectedExam,
+        slot: selectedSlot,
+        year: selectedYear,
+      });
+
+      alert("✅ Your paper request was submitted successfully 🎉");
+
+      setSearchText("");
+      setSelectedSubject(null);
+      setSelectedExam(null);
+      setSelectedSlot(null);
+      setSelectedYear(null);
+    } catch (error) {
+      console.error("Error submitting request:", error);
+      alert("❌ Failed to submit your request. Please try again later.");
+    }
   };
 
   return (
@@ -160,7 +174,11 @@ export default function PapersPage() {
           </div>
 
           <div className="mb-8 flex justify-center gap-4">
-            <Select onValueChange={setSelectedExam} disabled={!selectedSubject}>
+            <Select
+              onValueChange={setSelectedExam}
+              disabled={!selectedSubject}
+              value={selectedExam || undefined}
+            >
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Exam" />
               </SelectTrigger>
@@ -172,7 +190,11 @@ export default function PapersPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Select onValueChange={setSelectedSlot} disabled={!selectedSubject}>
+            <Select
+              onValueChange={setSelectedSlot}
+              disabled={!selectedSubject}
+              value={selectedSlot || undefined}
+            >
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Slot" />
               </SelectTrigger>
@@ -184,7 +206,11 @@ export default function PapersPage() {
                 ))}
               </SelectContent>
             </Select>
-            <Select onValueChange={setSelectedYear} disabled={!selectedSubject}>
+            <Select
+              onValueChange={setSelectedYear}
+              disabled={!selectedSubject}
+              value={selectedYear || undefined}
+            >
               <SelectTrigger className="w-32">
                 <SelectValue placeholder="Year" />
               </SelectTrigger>
@@ -208,7 +234,6 @@ export default function PapersPage() {
           </Button>
         </div>
 
-        {}
         <div className="mx-auto mt-16 max-w-6xl text-center">
           <div className="relative mb-8 text-center">
             <h3 className="font-vipnabd text-2xl font-bold">Explore More</h3>

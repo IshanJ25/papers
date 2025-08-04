@@ -172,6 +172,12 @@ export interface IPaper {
     | "Bhopal"
     | "Bangalore"
     | "Mauritius";
+    | "Vellore"
+    | "Chennai"
+    | "Andhra Pradesh"
+    | "Bhopal"
+    | "Bangalore"
+    | "Mauritius";
   slot: string;
   subject: string;
   year: string;
@@ -182,6 +188,12 @@ export type ExamDetail = {
   subject: string;
   slot: string;
   "course-code": string;
+  exam: string;
+  semester:
+    | "Fall Semester"
+    | "Winter Semester"
+    | "Summer Semester"
+    | "Weekend Semester";
   exam: string;
   semester:
     | "Fall Semester"

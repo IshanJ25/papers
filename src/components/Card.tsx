@@ -66,6 +66,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
     <div
       className={cn(
         "overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
+        "overflow-hidden rounded-sm border-2 border-[#734DFF] bg-[#FFFFFF] font-play transition-all duration-150 hover:bg-[#EFEAFF] dark:border-[#36266D] dark:bg-[#171720] hover:dark:bg-[#262635]",
         checked && "bg-white",
       )}
     >
@@ -80,6 +81,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
 
         <div className="justify-center">
           <div className="flex flex-row items-center justify-between px-4 pb-2">
+            <div className="text-md font-play font-medium">
             <div className="text-md font-play font-medium">
               {extractBracketContent(paper.subject)}
             </div>
@@ -115,6 +117,7 @@ const Card = ({ paper, onSelect, isSelected }: CardProps) => {
         </div>
       </Link>
 
+      <div className="hidden items-center justify-between gap-2 px-4 pb-4 font-play md:flex">
       <div className="hidden items-center justify-between gap-2 px-4 pb-4 font-play md:flex">
         <div className="flex items-center gap-2">
           <input

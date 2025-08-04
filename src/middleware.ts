@@ -1,9 +1,13 @@
 import { type NextRequest, NextResponse } from "next/server";
 import { Ratelimit } from "@upstash/ratelimit";
 import { kv } from "@vercel/kv";
+import { type NextRequest, NextResponse } from "next/server";
+import { Ratelimit } from "@upstash/ratelimit";
+import { kv } from "@vercel/kv";
 
 const ratelimit = new Ratelimit({
   redis: kv,
+  limiter: Ratelimit.slidingWindow(100, "900 s"),
   limiter: Ratelimit.slidingWindow(100, "900 s"),
 });
 

@@ -74,15 +74,11 @@ export async function POST(req: Request) {
           return;
         }
 
-        console.log("this is happening 1");
-
         const mergedPdfBytes = await CreatePDF(files);
         [public_id_cloudinary, final_url] = await uploadPDFFile(
           mergedPdfBytes,
           uploadPreset,
         );
-
-        console.log("this is happening 2");
       } catch (error) {
         console.error("Error creating PDF:", error);
         return NextResponse.json(
@@ -91,7 +87,6 @@ export async function POST(req: Request) {
         );
       }
     } else {
-      console.log("this is happening 3");
       [public_id_cloudinary, final_url] = await uploadPDFFile(
         files[0]!,
         uploadPreset,
@@ -106,8 +101,6 @@ export async function POST(req: Request) {
       .replace("upload", "upload/w_400,h_400,c_fill")
       .replace(/<img src='|'\s*\/>/g, "");
 
-    console.log("this is happening 4");
-
     const paper = new PaperAdmin({
       cloudinary_index: configIndex,
       public_id_cloudinary,
@@ -121,9 +114,7 @@ export async function POST(req: Request) {
       campus: null,
     });
 
-    console.log("this is happening 5");
     await paper.save();
-    console.log("this is happening 6");
     return NextResponse.json({ status: "success" }, { status: 201 });
   } catch (error) {
     console.error(error);
@@ -135,7 +126,6 @@ export async function POST(req: Request) {
 }
 
 async function uploadPDFFile(file: File | ArrayBuffer, uploadPreset: string) {
-  console.log("this is happening 7");
   let bytes;
   if (file instanceof File) {
     bytes = await file.arrayBuffer();
@@ -151,16 +141,14 @@ async function uploadFile(
   fileType: string,
 ) {
   try {
-    console.log("this is happening 8");
     const buffer = Buffer.from(bytes);
-    console.log("this is happening 9");
     const dataUrl = `data:${fileType};base64,${buffer.toString("base64")}`;
-    console.log("this is happening 10");
+
     const uploadResult = (await cloudinary.v2.uploader.unsigned_upload(
       dataUrl,
       uploadPreset,
     )) as CloudinaryUploadResult;
-    console.log("this is happening 11");
+
     return [uploadResult.public_id, uploadResult.secure_url];
   } catch (e) {
     throw e;
