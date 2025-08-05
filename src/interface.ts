@@ -172,7 +172,6 @@ export interface IPaper {
     | "Bhopal"
     | "Bangalore"
     | "Mauritius"
-    | null;
   slot: string;
   subject: string;
   year: string;

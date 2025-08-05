@@ -159,7 +159,6 @@ const PaperPage = async ({ params }: { params: { id: string } }) => {
       ) : (
         <>
           <h1 className="my-6 flex justify-center gap-4 text-center font-play text-2xl font-semibold md:mb-10 md:text-3xl">
-          <h1 className="my-6 flex justify-center gap-4 text-center font-play text-2xl font-semibold md:mb-10 md:text-3xl">
             <div>
               {paper.subject} {paper.exam} {paper.slot} {paper.year}
             </div>
