@@ -17,7 +17,6 @@
   color: #888888;
 }
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -75,57 +74,67 @@
   }
 }
 
-
 @layer base {
   * {
+    @apply scroll-smooth;
+
     @apply border-border;
   }
+
   body {
     @apply bg-background text-foreground;
   }
 }
 
 @font-face {
-  font-family: "phonk";
-  src: url(/phonkfont.otf);
-}
-@font-face {
   font-family: "jost";
   src: url(/jostfont.ttf);
 }
-.jost{
-  font-family: "jost";
+
+@font-face {
+  font-family: "vipna";
+  src: url(/Vipnagorgialla.otf);
 }
-.phonk{
-  font-family: "phonk";
+
+@font-face {
+  font-family: "vipnabd";
+  src: url(/VipnagorgiallaBd.otf);
 }
+
+@font-face {
+  font-family: "play";
+  src: url(/play.ttf);
+}
+
 .dark ::-webkit-scrollbar {
   width: 0.4rem;
   height: 0.4rem;
   background: #535253;
 }
 
-/* Track */
 .dark ::-webkit-scrollbar-track {
   background: #0c0c0c;
   border-radius: 0.6rem;
   z-index: -99;
 }
-/* Handle */
+
 .dark ::-webkit-scrollbar-thumb {
   background: #5c5957;
   border-radius: 1rem;
 }
+
 ::-webkit-scrollbar {
   width: 0.4rem;
   height: 0.4rem;
   background: #535253;
 }
+
 ::-webkit-scrollbar-track {
   background: #ffffff;
   border-radius: 0.6rem;
   z-index: -99;
 }
+
 ::-webkit-scrollbar-thumb {
   background: #929292;
   border-radius: 1rem;
@@ -140,4 +149,23 @@
   src: url("/fonts/yerk.woff") format("woff");
   font-weight: 400;
   font-style: normal;
+}
+
+body {
+  position: relative;
+}
+
+@layer utilities {
+
+  /* Chrome, Safari and Opera */
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+  }
 }

@@ -23,7 +23,9 @@
 //   thumbnail_url: string;
 //   type: string;
 //   url: string;
-// }
+
+import { mongo } from "mongoose";
+
 export interface CloudinaryUploadResult {
   asset_id: string;
   public_id: string;
@@ -46,6 +48,15 @@ export interface CloudinaryUploadResult {
   access_mode: string;
 }
 
+export interface IUpcomingSlot {
+  slot: string;
+}
+
+export interface IUpcomingSubject {
+  subject: string;
+  slots: string[];
+}
+
 export interface CloudinaryUploadWidgetProps {
   info: CloudinaryUploadResult;
   event?: string;
@@ -56,21 +67,27 @@ export interface PostRequestBody {
 }
 
 export interface PaperResponse {
-  finalUrl: string;
+  final_url: string;
   subject: string;
   year: string;
   slot: string;
   exam: string;
 }
+
 export interface IAdminPaper {
   public_id_cloudinary: string;
-  finalUrl: string;
-  thumbnailUrl: string;
-  subject: string;
-  slot: string;
-  year: string;
-  exam: "CAT-1" | "CAT-2" | "FAT" | "Model";
-  semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
+  final_url: string;
+  thumbnail_url: string;
+  subject: string | null;
+  slot: string | null;
+  year: string | null;
+  exam: "CAT-1" | "CAT-2" | "FAT" | "Model" | null;
+  semester:
+    | "Fall Semester"
+    | "Winter Semester"
+    | "Summer Semester"
+    | "Weekend Semester"
+    | null;
   cloudinary_index: number;
   campus:
     | "Vellore"
@@ -78,28 +95,32 @@ export interface IAdminPaper {
     | "Andhra Pradesh"
     | "Bhopal"
     | "Bangalore"
-    | "Mauritius";
-  answerKeyIncluded?: boolean;
-  isSelected?: boolean;
+    | "Mauritius"
+    | null;
+  answer_key_included?: boolean | null;
+  is_selected?: boolean;
 }
 
 export interface ICourses {
   name: string;
 }
+
 export interface IAdminUpload {
-  formData: FormData;
+  form_data: FormData;
   files: File[];
-  publicIds: Array<string>;
+  public_ids: Array<string>;
   subject: string;
   slot: string;
   year: string;
   exam: "CAT-1" | "CAT-2" | "FAT";
-  isPdf: boolean;
+  is_pdf: boolean;
 }
+
 export interface APIResponse {
   message: string;
   status: number;
 }
+
 export interface ConverttoPDFResponse {
   url: string;
   secure_url: string;
@@ -129,37 +150,58 @@ export interface DecryptedLoginResponse {
   };
 }
 
+export interface IUpcomingPaper extends mongo.Document {
+  subject: string;
+  slots: string[];
+}
+
 export interface IPaper {
   _id: string;
   exam: "CAT-1" | "CAT-2" | "FAT" | "Model CAT-1" | "Model CAT-2" | "Model FAT";
-  finalUrl: string;
-  thumbnailUrl: string;
-  semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
+  final_url: string;
+  thumbnail_url: string;
+  semester:
+    | "Fall Semester"
+    | "Winter Semester"
+    | "Summer Semester"
+    | "Weekend Semester";
   campus:
     | "Vellore"
     | "Chennai"
     | "Andhra Pradesh"
     | "Bhopal"
     | "Bangalore"
-    | "Mauritius";
+    | "Mauritius"
+    | null;
   slot: string;
   subject: string;
   year: string;
-  answerKeyIncluded?: boolean;
+  answer_key_included?: boolean;
 }
+
 export type ExamDetail = {
   subject: string;
   slot: string;
   "course-code": string;
-  "exam": string;
-  semester: "Fall Semester" | "Winter Semester" | "Summer Semester" | "Weekend Semester";
+  exam: string;
+  semester:
+    | "Fall Semester"
+    | "Winter Semester"
+    | "Summer Semester"
+    | "Weekend Semester";
   year: string;
+  answer_key_included: boolean | undefined;
 };
+
 export interface Filters {
   papers: IPaper[];
-  uniqueExams: string[];
-  uniqueSlots: string[];
-  uniqueYears: string[];
-  uniqueCampuses: string[];
-  uniqueSemesters: string[];
+  unique_exams: string[];
+  unique_slots: string[];
+  unique_years: string[];
+  unique_campuses: string[];
+  unique_semesters: string[];
+}
+
+export interface StoredSubjects {
+  subjects: string[];
 }

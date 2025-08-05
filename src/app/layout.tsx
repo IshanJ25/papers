@@ -4,14 +4,16 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { GeistSans } from "geist/font/sans";
 import Script from "next/script";
 import type { Metadata } from "next";
-import Banner from "@/components/Banner";
+import Navbar from "@/components/Navbar";
+import Footer from "@/components/Footer";
+import ChildrenWrapper from "@/components/ChildrenWrapper";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://papers.codechefvit.com/"),
   title: "Papers by CodeChef-VIT | Explore VIT Previous Year Question Papers",
   description:
     "Discover previous year question papers created by CodeChef-VIT at Vellore Institute of Technology. Made with ♡ to help students excel.",
-  icons: [{ rel: "icon", url: "/codechef_logo.svg" }],
+  icons: [{ rel: "icon", url: "/favicon.svg" }],
   openGraph: {
     title: "Papers by CodeChef-VIT | Exam Resources",
     images: [{ url: "/papers.png" }],
@@ -84,6 +86,7 @@ export const metadata: Metadata = {
   ],
   robots: "index, follow",
 };
+export const revalidate = 60;
 
 export default function RootLayout({
   children,
@@ -116,8 +119,12 @@ export default function RootLayout({
           disableTransitionOnChange
         >
           <Toaster position="top-right" reverseOrder={false} />
-        
-          {children}
+          <div className="bg-[#F3F5FF] dark:bg-[#070114]">
+            <Navbar />
+            <ChildrenWrapper>{children}</ChildrenWrapper>
+
+            <Footer />
+          </div>
         </ThemeProvider>
       </body>
     </html>

@@ -1,5 +1,4 @@
-// "use server";
-import {  type PaperResponse } from "@/interface";
+import { type PaperResponse } from "@/interface";
 import axios, { type AxiosResponse } from "axios";
 
 export const fetchPaperID = async (id: string): Promise<PaperResponse> => {
@@ -12,7 +11,7 @@ export const fetchPaperID = async (id: string): Promise<PaperResponse> => {
     return response.data;
   } catch (err: unknown) {
     if (axios.isAxiosError(err)) {
-      console.error("Axios error:", err.response?.data || err.message);
+      console.error("Axios error:", err.response?.data ?? err.message);
       const errorMessage = (err.response?.data as { message?: string })?.message ?? "Failed to fetch paper";
       throw new Error(errorMessage);
     } else {

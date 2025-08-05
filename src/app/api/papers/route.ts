@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { connectToDatabase } from "@/lib/mongoose";
 import Paper from "@/db/papers";
-import { type IPaper,  } from "@/interface";
+import { type IPaper } from "@/interface";
 
 export const dynamic = "force-dynamic";
 
@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
     const escapeRegExp = (text: string) => {
       return text.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     };
-    const escapedSubject = escapeRegExp(subject!);
+    const escapedSubject = escapeRegExp(subject ?? "");
 
     if (!subject) {
       return NextResponse.json(
@@ -21,32 +21,50 @@ export async function GET(req: NextRequest) {
         { status: 400 },
       );
     }
-    console.log((await Paper.find()).map((paper)=> paper.campus))
+
     const papers: IPaper[] = await Paper.find({
       subject: { $regex: new RegExp(`${escapedSubject}`, "i") },
     });
-    console.log(papers[0]?.campus)
+
     if (papers.length === 0) {
       return NextResponse.json(
-        { message: "No papers found for the specified subject" },
-        { status: 404 },
+        {
+          papers,
+          unique_years: [],
+          unique_slots: [],
+          unique_exams: [],
+          unique_campuses: [],
+          unique_semesters: [],
+        },
+        { status: 200 },
       );
     }
 
-    const uniqueYears = Array.from(new Set(papers.map((paper) => paper.year)));
-    const uniqueSlots = Array.from(new Set(papers.map((paper) => paper.slot)));
-    const uniqueExams = Array.from(new Set(papers.map((paper) => paper.exam)));
-    const uniqueCampuses = Array.from(new Set(papers.map((paper) => paper.campus)));
-    const uniqueSemesters = Array.from(new Set(papers.map((paper) => paper.semester)));
+    const unique_years = Array.from(new Set(papers.map((paper) => paper.year)));
+    const unique_slots = Array.from(new Set(papers.map((paper) => paper.slot)));
+    const unique_exams = Array.from(new Set(papers.map((paper) => paper.exam)));
+    const unique_campuses = Array.from(
+      new Set(papers.map((paper) => paper.campus)),
+    );
+    const unique_semesters = Array.from(
+      new Set(papers.map((paper) => paper.semester)),
+    );
 
     return NextResponse.json(
-      { papers, uniqueYears, uniqueSlots, uniqueExams, uniqueCampuses, uniqueSemesters },
-      { status: 200 }
+      {
+        papers,
+        unique_years,
+        unique_slots,
+        unique_exams,
+        unique_campuses,
+        unique_semesters,
+      },
+      { status: 200 },
     );
   } catch (error) {
     return NextResponse.json(
       { message: "Failed to fetch papers", error },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

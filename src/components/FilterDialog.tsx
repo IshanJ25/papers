@@ -27,8 +27,8 @@ export const FilterDialog = ({
   initialExams: string[] | undefined;
   initialSlots: string[] | undefined;
   initialYears: string[] | undefined;
-  initialCampuses: string [] | undefined
-  initialSemesters: string [] | undefined
+  initialCampuses: string[] | undefined;
+  initialSemesters: string[] | undefined;
 
   onReset: () => void;
   onApplyFilters: (exams: string[], slots: string[], years: string[]) => void;
@@ -43,10 +43,10 @@ export const FilterDialog = ({
     initialYears ?? [],
   );
   const [selectedCampuses, setSelectedCampuses] = useState<string[]>(
-    initialYears ?? [],
+    initialCampuses ?? [],
   );
   const [selectedSemesters, setSelectedSemesters] = useState<string[]>(
-    initialYears ?? [],
+    initialSemesters ?? [],
   );
   const [open, setOpen] = useState(false);
 
@@ -55,29 +55,39 @@ export const FilterDialog = ({
     setSelectedSlots(initialSlots ?? []);
     setSelectedYears(initialYears ?? []);
     setSelectedCampuses(initialCampuses ?? []);
-    setSelectedSemesters(initialSemesters ?? [])
-  }, [initialExams, initialSlots, initialYears]);
+    setSelectedSemesters(initialSemesters ?? []);
+  }, [
+    initialExams,
+    initialSlots,
+    initialYears,
+    initialCampuses,
+    initialSemesters,
+  ]);
 
-  const exams = filterOptions.uniqueExams.map((exam) => ({
+  const exams = filterOptions.unique_exams.map((exam) => ({
     label: exam,
     value: exam,
   }));
-  const slots = filterOptions.uniqueSlots.map((slot) => ({
-  label: slot,
-    value: slot,
-  }));
-  const years = filterOptions.uniqueYears.map((year) => ({
+  const slots = filterOptions.unique_slots
+    .sort((a, b) => a.localeCompare(b))
+    .map((slot) => ({
+      label: slot,
+      value: slot,
+    }));
+  const years = filterOptions.unique_years.map((year) => ({
     label: year,
     value: year,
   }));
-  const semesters = filterOptions.uniqueSemesters.map((semester) => ({
+  const semesters = filterOptions.unique_semesters.map((semester) => ({
     label: semester,
     value: semester,
   }));
-  const campuses = filterOptions.uniqueCampuses.map((campus) => ({
-    label: campus,
-    value: campus,
-  }));
+
+  // const campuses = filterOptions.uniqueCampuses.map((campus) => ({
+  //   label: campus,
+  //   value: campus,
+  // }));
+
   const handleFilterClick = () => {
     onApplyFilters(selectedExams, selectedSlots, selectedYears);
     setOpen(false);
@@ -88,7 +98,6 @@ export const FilterDialog = ({
     setSelectedSlots([]);
     setSelectedYears([]);
     setSelectedSemesters([]);
-
     setSelectedCampuses([]);
     setOpen(false);
     onReset();
@@ -112,31 +121,31 @@ export const FilterDialog = ({
             options={exams}
             onValueChange={setSelectedExams}
             placeholder="Exams"
-            defaultValue={selectedExams}
+            value={selectedExams}
           />
           <MultiSelect
             options={slots}
             onValueChange={setSelectedSlots}
             placeholder="Slots"
-            defaultValue={selectedSlots}
+            value={selectedSlots}
           />
           <MultiSelect
             options={years}
             onValueChange={setSelectedYears}
             placeholder="Years"
-            defaultValue={selectedYears}
+            value={selectedYears}
           />
           <MultiSelect
             options={semesters}
             onValueChange={setSelectedSemesters}
             placeholder="Semesters"
-            defaultValue={selectedSemesters}
+            value={selectedSemesters}
           />
           {/* <MultiSelect
             options={campuses}
             onValueChange={setSelectedCampuses}
             placeholder="Campuses"
-            defaultValue={selectedCampuses}
+            value={selectedCampuses}
           /> */}
         </div>
         <div className="flex justify-between">

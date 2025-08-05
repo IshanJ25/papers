@@ -1,52 +1,66 @@
 "use client";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import axios, { AxiosError } from "axios";
 import toast from "react-hot-toast";
 import { handleAPIError } from "../../util/error";
 import { Button } from "@/components/ui/button";
-import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import { type APIResponse } from "@/interface";
 import Dropzone from "react-dropzone";
-
-import { createCanvas } from "canvas";
-import { getDocument, GlobalWorkerOptions } from "pdfjs-dist";
-import { PDFDocument } from "pdf-lib";
-async function pdfToImage(file: File) {
-  GlobalWorkerOptions.workerSrc =
-    "https://unpkg.com/pdfjs-dist@3.4.120/build/pdf.worker.min.js";
-
-  const pdfDoc = await PDFDocument.load(await file.arrayBuffer());
-
-  // Get the first page
-  const page = pdfDoc.getPages()[0];
-  if (!page) {
-    throw Error("First page not found");
-  }
-  // Create a canvas to render the image
-  const canvas = createCanvas(page.getWidth(), page.getHeight());
-  const context = canvas.getContext("2d");
-
-  // Use pdfjs-dist to render the page
-  const pdfjsDoc = await getDocument({ data: await file.arrayBuffer() })
-    .promise;
-  const pdfPage = await pdfjsDoc.getPage(1);
-
-  // Render page to canvas
-  const viewport = pdfPage.getViewport({ scale: 1 });
-  await pdfPage.render({ canvasContext: context, viewport }).promise;
-
-  // Convert the canvas to the desired output (Buffer, base64, etc.)
-  return canvas.toDataURL().replace(/^data:image\/\w+;base64,/, "");
-}
+import { Upload } from "lucide-react";
 
 const Page = () => {
   const [campus, setCampus] = useState("Vellore");
-
   const [files, setFiles] = useState<File[]>([]);
-
   const [isUploading, setIsUploading] = useState(false);
   const [, setResetSearch] = useState(false);
+  const [isDragging, setIsDragging] = useState(false);
+  const [isGlobalDragging, setIsGlobalDragging] = useState(false);
+
+  useEffect(() => {
+    const handleDragEnter = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsGlobalDragging(true);
+    };
+
+    const handleDragOver = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const handleDragLeave = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      if (
+        !e.relatedTarget ||
+        (e.currentTarget !== e.relatedTarget &&
+          !(e.currentTarget as Element)?.contains(e.relatedTarget as Node))
+      ) {
+        setIsGlobalDragging(false);
+      }
+    };
+
+    const handleDrop = (e: DragEvent) => {
+      e.preventDefault();
+      e.stopPropagation();
+      setIsGlobalDragging(false);
+    };
+
+    document.addEventListener("dragenter", handleDragEnter);
+    document.addEventListener("dragover", handleDragOver);
+    document.addEventListener("dragleave", handleDragLeave);
+    document.addEventListener("drop", handleDrop);
+
+    return () => {
+      document.removeEventListener("dragenter", handleDragEnter);
+      document.removeEventListener("dragover", handleDragOver);
+      document.removeEventListener("dragleave", handleDragLeave);
+      document.removeEventListener("drop", handleDrop);
+    };
+  }, []);
+
   function fileCheckAndSelect<T extends File>(acceptedFiles: T[]) {
     const maxFileSize = 5 * 1024 * 1024;
     const allowedFileTypes = [
@@ -71,12 +85,10 @@ const Page = () => {
       return;
     }
 
-    // File validations
     const invalidFiles = acceptedFiles.filter(
       (file) =>
         file.size > maxFileSize || !allowedFileTypes.includes(file.type),
     );
-
     if (invalidFiles.length > 0) {
       toast.error(
         `Some files are invalid. Ensure each file is below 5MB and of an allowed type (PDF, JPEG, PNG, GIF).`,
@@ -87,15 +99,17 @@ const Page = () => {
       return;
     }
 
-    const isPdf =
-      acceptedFiles.length === 1 &&
-      acceptedFiles[0]?.type === "application/pdf";
+    const isPdf = acceptedFiles.reduce(
+      (reducer, file) => file.type === "application/pdf" || reducer,
+      false,
+    );
     if (isPdf && acceptedFiles.length > 1) {
       toast.error("PDFs must be uploaded separately", {
         id: toastId,
       });
       return;
     }
+
     const orderedFiles = acceptedFiles.sort((a, b) => {
       return a.lastModified - b.lastModified;
     });
@@ -104,6 +118,7 @@ const Page = () => {
       id: toastId,
     });
   }
+
   const handlePrint = async () => {
     if (!campus) {
       setCampus("Vellore");
@@ -111,19 +126,12 @@ const Page = () => {
 
     const isPdf = files.length === 1 && files[0]?.type === "application/pdf";
 
-    // Prepare FormData
     const formData = new FormData();
     files.forEach((file) => {
       formData.append("files", file);
     });
 
-    if (isPdf && files[0]) {
-      formData.append("image", await pdfToImage(files[0]));
-    }
-
-    // formData.append("exam", exam);
     formData.append("campus", campus);
-
     formData.append("isPdf", String(isPdf));
 
     setIsUploading(true);
@@ -132,14 +140,15 @@ const Page = () => {
       await toast.promise(
         async () => {
           try {
-            await axios.post<APIResponse>(
-              "/api/ai-upload",
-              formData,
-            );
+            console.log("this is happening now");
+            await axios.post<APIResponse>("/api/upload", formData);
+            console.log("this is happening after now");
+            return { message: "Papers uploaded successfully!" };
           } catch (error) {
-            if (error instanceof AxiosError && error.response?.data ) {
+            if (error instanceof AxiosError && error.response?.data) {
               const errorData = error.response.data as APIResponse;
-              const errorMessage = errorData.message || "Failed to upload papers";
+              const errorMessage =
+                errorData.message || "Failed to upload papers";
               throw new Error(errorMessage);
             }
             throw new Error("Failed to upload papers");
@@ -154,10 +163,6 @@ const Page = () => {
         },
       );
 
-      // setSlot("");
-      // setSubject("");
-      // setExam("");
-      // setYear("");
       setFiles([]);
       setResetSearch(true);
       setTimeout(() => setResetSearch(false), 100);
@@ -168,29 +173,52 @@ const Page = () => {
     }
   };
 
-  return (
-    <div className="flex h-screen flex-col justify-between">
-      <div>
-        <Navbar />
-      </div>
-      <div className="2xl:my-15 flex flex-col items-center">
-        <fieldset className="mb-4 w-[350px] rounded-lg border-2 border-gray-300 p-4 pr-8">
-          {/* <legend className="text-lg font-bold">Upload papers</legend> */}
+  const isCurrentlyDragging = isDragging || isGlobalDragging;
 
+  return (
+    <div className="flex h-[calc(100vh-85px)] flex-col justify-center px-6 font-play">
+      <div className="2xl:my-15 flex flex-col items-center">
+        <fieldset className="mb-4 w-full max-w-md rounded-lg border-2 border-gray-300 p-4 pr-8">
           <div className="flex w-full flex-col 2xl:gap-y-4">
             {/* File Dropzone */}
             <div>
-              <Dropzone onDrop={fileCheckAndSelect}>
+              <Dropzone
+                onDrop={fileCheckAndSelect}
+                onDragEnter={() => setIsDragging(true)}
+                onDragLeave={() => setIsDragging(false)}
+                onDropAccepted={() => {
+                  setIsDragging(false);
+                  setIsGlobalDragging(false);
+                }}
+                onDropRejected={() => {
+                  setIsDragging(false);
+                  setIsGlobalDragging(false);
+                }}
+              >
                 {({ getRootProps, getInputProps }) => (
-                  <section className="my-2 -mr-2 cursor-pointer rounded-2xl border-2 border-dashed p-8 text-center">
-                    <div {...getRootProps()}>
-                      <input {...getInputProps()} />
+                  <section
+                    {...getRootProps()}
+                    className={`my-2 -mr-2 cursor-pointer rounded-2xl border-2 ${
+                      isCurrentlyDragging
+                        ? "border-solid border-[#6D28D9] bg-purple-50 dark:bg-[#130E1F]"
+                        : "border-dashed border-gray-300"
+                    } p-8 text-center transition-all duration-200`}
+                  >
+                    <input {...getInputProps()} />
+                    {isCurrentlyDragging ? (
+                      <div className="flex flex-col items-center">
+                        <p className="text-lg font-medium text-[#6D28D9]">
+                          Drop files here
+                        </p>
+                        <Upload className="mt-2 h-10 w-10 animate-bounce text-[#6D28D9]" />
+                      </div>
+                    ) : (
                       <p>
                         Drag &apos;n&apos; drop some files here, or{" "}
                         <span className="text-[#6D28D9]">click</span> to select
                         files
                       </p>
-                    </div>
+                    )}
                     <div
                       className={`mt-2 text-xs ${
                         files?.length === 0 ? "text-red-500" : "text-gray-600"
@@ -202,7 +230,7 @@ const Page = () => {
                 )}
               </Dropzone>
               <label className="mx-2 -mr-2 block text-center text-xs font-medium text-gray-700">
-                Only Images and PDFs are allowed
+                Only Images and PDF are allowed
                 <sup className="text-red-500">*</sup>
               </label>
             </div>
@@ -210,14 +238,13 @@ const Page = () => {
         </fieldset>
         <Button
           onClick={handlePrint}
-          disabled={isUploading}
-          className={`w-fit rounded-md px-4 py-3 ${isUploading ? "bg-gray-300" : ""}`}
+          disabled={isUploading || files.length === 0}
+          className={`w-fit rounded-md px-4 py-3 text-base ${
+            isUploading || files.length === 0 ? "opacity-60" : ""
+          }`}
         >
           {isUploading ? "Uploading..." : "Upload Papers"}
         </Button>
-      </div>
-      <div>
-        <Footer />
       </div>
     </div>
   );
