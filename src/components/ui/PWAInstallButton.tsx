@@ -70,13 +70,10 @@ const PWAInstallButton = () => {
 
       
       <div
-        onClick={handleInstall}
-        className="hidden md:flex items-center gap-3 rounded-full px-5 py-2 text-white cursor-pointer"
-        style={{
-          backgroundColor: "#130e1f",
-          border: "1.5px solid #FFFFFF26",
-        }}
-      >
+  onClick={handleInstall}
+  className="hidden md:flex items-center gap-3 rounded-full px-5 py-2 text-white cursor-pointer bg-[#130e1f] border border-[#FFFFFF26] border-[1.5px]"
+>
+
         <Image
           src="/papers_logo.png"
           alt="Papers App"
