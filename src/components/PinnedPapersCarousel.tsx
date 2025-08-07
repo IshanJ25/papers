@@ -172,7 +172,12 @@ function PinnedPapersCarousel({
                     ))}
 
                     {isLastChunk && displayPapers.length < 8 && (
-                      <div className="h-full">
+                      <div
+                        className="h-full"
+                        onClick={() => {
+                          window.dispatchEvent(new Event("addButtonClicked"));
+                        }}
+                      >
                         <AddPapers />
                       </div>
                     )}
