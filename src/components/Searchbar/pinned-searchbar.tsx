@@ -25,6 +25,7 @@ function PinnedSearchBar({
   const [pinned, setPinned] = useState<boolean>(false);
   const [open, setOpen] = useState(false);
   const [showControls, setShowControls] = useState(false);
+  const searchRef = useRef<HTMLInputElement>(null);
 
   const fuzzy = new Fuse(initialSubjects);
 
@@ -73,6 +74,18 @@ function PinnedSearchBar({
       setSuggestions([]);
     }
   };
+
+  useEffect(() => {
+    const handleAddClicked = () => {
+      searchRef.current?.focus();
+    };
+
+    window.addEventListener("addButtonClicked", handleAddClicked);
+
+    return () => {
+      window.removeEventListener("addButtonClicked", handleAddClicked);
+    };
+  }, []);
 
   const handlePinToggle = () => {
     const current = !pinned;
@@ -154,6 +167,7 @@ function PinnedSearchBar({
                 <Input
                   type="text"
                   value={searchText}
+                  ref={searchRef}
                   onChange={handleSearchChange}
                   placeholder="Search subject to pin..."
                   className={`text-md w-full rounded-lg bg-[#B2B8FF] px-4 py-6 pr-10 font-play tracking-wider text-black shadow-sm ring-0 placeholder:text-black focus:outline-none focus:ring-0 dark:bg-[#7480FF66] dark:text-white placeholder:dark:text-white ${
@@ -189,7 +203,11 @@ function PinnedSearchBar({
               </div>
 
               <div className="hidden md:block">
-                <PinButton isPinned={pinned} onToggle={handlePinToggle} />
+                <PinButton
+                  isPinned={pinned}
+                  onToggle={handlePinToggle}
+                  disabled={!showControls && searchText.trim() === ""}
+                />
               </div>
 
               <div
@@ -210,6 +228,7 @@ function PinnedSearchBar({
                         handlePinToggle();
                         setOpen(false);
                       }}
+                      disabled={!showControls && searchText.trim() === ""}
                     />
                     <button
                       onClick={() => {

@@ -1,5 +1,6 @@
 "use server";
 
+import React from "react";
 import axios from "axios";
 import { type ICourses } from "@/interface";
 import SearchBarChild from "./searchbar-child";
@@ -18,7 +19,11 @@ export async function fetchSubjects() {
   }
 }
 
-export default async function SearchBar({ type = "default" }) {
+export default async function SearchBar({
+  type = "default",
+}: {
+  type?: "default" | "pinned";
+}) {
   const subjects = await fetchSubjects();
 
   return type === "pinned" ? (
