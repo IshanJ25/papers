@@ -6,7 +6,8 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import ccLogo from "../assets/codechef_logo.svg";
 import ModeToggle from "@/components/toggle-theme";
-import { ArrowDownLeftIcon, Pin } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { ArrowDownLeftIcon, Pin, ArrowUpRight } from "lucide-react";
 import NavDropdownButton from "./NavDropdownButton";
 import FloatingNavbar from "./FloatingNavbar";
 import PWAInstallButton from "./ui/PWAInstallButton";
@@ -62,7 +63,17 @@ function Navbar() {
                 Pinned Subjects
               </div>
             </Link>
+            <div className="ml-2 hidden md:flex">
+              <Link href="/request">
+                <div className="ml-2 flex items-center gap-2 rounded-full border border-[#3A3745] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1A1823]">
+                  <ArrowUpRight className="h-4 w-4" />
+                  Paper Request
+                </div>
+              </Link>
+            </div>
           </div>
+
+          {/* Desktop: Create Paper Request button */}
         </div>
 
         <div className="hidden items-center gap-4 md:flex">
@@ -84,6 +95,7 @@ function Navbar() {
           </Link>
         </div>
 
+        {/* Mobile: Create Paper Request button inside dropdown */}
         <div className="md:hidden" ref={dropdownContainerRef}>
           <NavDropdownButton
             isOpen={open}

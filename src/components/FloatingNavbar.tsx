@@ -2,8 +2,9 @@
 
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { Pin, UploadIcon } from "lucide-react";
+import { ArrowUpRight, Pin, UploadIcon } from "lucide-react";
 import ModeToggle from "./toggle-theme";
+import { Button } from "./ui/button";
 
 interface Props {
   onNavigate: () => void;
@@ -33,7 +34,14 @@ export default function FloatingNavbar({ onNavigate }: Props) {
             <span>Pinned Subjects</span>
           </div>
         </Link>
-
+        <div className="px-4 py-2">
+          <Link href="/request" onClick={onNavigate}>
+            <div className="flex items-center gap-2 rounded-full border border-[#3A3745] px-4 py-2 text-sm font-semibold text-white transition hover:bg-[#1A1823] w-full justify-center">
+              <ArrowUpRight className="h-4 w-4" />
+              Paper Request
+            </div>
+          </Link>
+        </div>
         <div className="rounded-full border border-[#3A3745] p-1">
           <ModeToggle />
         </div>
