@@ -145,7 +145,7 @@ function SearchBarChild({
                   </div>
                   <span
                     id="subject"
-                    className="items-center text-sm tracking-wide text-white sm:text-base"
+                    className="items-center text-sm tracking-wide text-black dark:text-white sm:text-base"
                   >
                     {suggestion}
                   </span>
