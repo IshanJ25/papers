@@ -70,6 +70,65 @@ function SideBar({
       value: semester,
     })) ?? [];
 
+  const filtersForSidebar = [
+    {
+      label: "Exams",
+      data: exams,
+      selected: selectedExams,
+      updater: (newVal: string[]) =>
+        handleApplyFilters(
+          newVal,
+          selectedSlots,
+          selectedYears,
+          selectedCampuses,
+          selectedSemesters,
+          selectedAnswerKeyIncluded,
+        ),
+    },
+    {
+      label: "Slots",
+      data: slots,
+      selected: selectedSlots,
+      updater: (newVal: string[]) =>
+        handleApplyFilters(
+          selectedExams,
+          newVal,
+          selectedYears,
+          selectedCampuses,
+          selectedSemesters,
+          selectedAnswerKeyIncluded,
+        ),
+    },
+    {
+      label: "Years",
+      data: years,
+      selected: selectedYears,
+      updater: (newVal: string[]) =>
+        handleApplyFilters(
+          selectedExams,
+          selectedSlots,
+          newVal,
+          selectedCampuses,
+          selectedSemesters,
+          selectedAnswerKeyIncluded,
+        ),
+    },
+    {
+      label: "Semesters",
+      data: semesters,
+      selected: selectedSemesters,
+      updater: (newVal: string[]) =>
+        handleApplyFilters(
+          selectedExams,
+          selectedSlots,
+          selectedYears,
+          selectedCampuses,
+          newVal,
+          selectedAnswerKeyIncluded,
+        ),
+    },
+  ];
+
   return (
     <div className="no-scrollbar fixed sticky top-0 h-[100vh] flex-col items-baseline overflow-y-auto border-r-2 border-[#36266d] bg-[#f3f5ff] pt-[10px] dark:bg-[#070114] md:flex">
       <div className="flex w-full items-center justify-between border-b-2 border-[#36266d] px-[10px] py-4">
@@ -134,64 +193,7 @@ function SideBar({
       </div>
 
       {/* Filters */}
-      {[
-        {
-          label: "Exams",
-          data: exams,
-          selected: selectedExams,
-          updater: (newVal: string[]) =>
-            handleApplyFilters(
-              newVal,
-              selectedSlots,
-              selectedYears,
-              selectedCampuses,
-              selectedSemesters,
-              selectedAnswerKeyIncluded,
-            ),
-        },
-        {
-          label: "Slots",
-          data: slots,
-          selected: selectedSlots,
-          updater: (newVal: string[]) =>
-            handleApplyFilters(
-              selectedExams,
-              newVal,
-              selectedYears,
-              selectedCampuses,
-              selectedSemesters,
-              selectedAnswerKeyIncluded,
-            ),
-        },
-        {
-          label: "Years",
-          data: years,
-          selected: selectedYears,
-          updater: (newVal: string[]) =>
-            handleApplyFilters(
-              selectedExams,
-              selectedSlots,
-              newVal,
-              selectedCampuses,
-              selectedSemesters,
-              selectedAnswerKeyIncluded,
-            ),
-        },
-        {
-          label: "Semesters",
-          data: semesters,
-          selected: selectedSemesters,
-          updater: (newVal: string[]) =>
-            handleApplyFilters(
-              selectedExams,
-              selectedSlots,
-              selectedYears,
-              selectedCampuses,
-              newVal,
-              selectedAnswerKeyIncluded,
-            ),
-        },
-      ].map((section) => (
+      {filtersForSidebar.map((section) => (
         <div
           key={section.label}
           className="flex w-full flex-col items-baseline justify-between border-b-2 border-[#36266d] px-[10px]"

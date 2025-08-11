@@ -6,7 +6,6 @@ import axios, { type AxiosError } from "axios";
 import { Button } from "@/components/ui/button";
 import { type IPaper, type Filters } from "@/interface";
 import Card from "./Card";
-import { extractBracketContent } from "@/util/utils";
 import { useRouter } from "next/navigation";
 import Loader from "./ui/loader";
 import SideBar from "../components/SideBar";
@@ -15,6 +14,7 @@ import { Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Pin } from "lucide-react";
 import { StoredSubjects } from "@/interface";
+import { getSecureUrl, generateFileName, downloadFile } from "@/util/download";
 
 const CatalogueContent = () => {
   const router = useRouter();
@@ -162,28 +162,6 @@ const CatalogueContent = () => {
     },
     [],
   );
-
-  const getSecureUrl = (url: string): string =>
-    url.startsWith("http://") ? url.replace("http://", "https://") : url;
-
-  const generateFileName = (paper: IPaper): string => {
-    const extension = paper.final_url.split(".").pop();
-    return `${extractBracketContent(paper.subject)}-${paper.exam}-${paper.slot}-${paper.year}.${extension}`;
-  };
-
-  const downloadFile = async (url: string, filename: string): Promise<void> => {
-    try {
-      const response = await axios.get(url, { responseType: "blob" });
-      const blob = new Blob([response.data]);
-      const link = document.createElement("a");
-      link.href = window.URL.createObjectURL(blob);
-      link.download = filename;
-      link.click();
-      window.URL.revokeObjectURL(link.href);
-    } catch (error) {
-      console.error("Download failed:", error);
-    }
-  };
 
   const handleDownloadAll = useCallback(async () => {
     const uniquePapers = Array.from(
