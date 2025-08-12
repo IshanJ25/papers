@@ -209,3 +209,9 @@ export interface TransformedPaper {
   subject: string;
   slots: string[];
 }
+
+
+export interface IRelatedSubject {
+  subject: string;
+  related_subjects: string[];
+}
