@@ -143,29 +143,12 @@ function SearchBarChild({
                   >
                     {subjectCounts[suggestion] ?? "0"}
                   </div>
-
-                  {(() => {
-                    const codeMatch = /\[[^\]]+\]$/.exec(suggestion);
-                    const code = codeMatch ? codeMatch[0] : "";
-                    const title = suggestion.replace(/\s\[[^\]]+\]$/, "");
-
-                    let displayTitle = title;
-                    if (title.length > 40) {
-                      const start = title.slice(0, 25).trim();
-                      const end = title.slice(-15).trim();
-                      displayTitle = `${start}.....${end}`;
-                    }
-
-                    return (
-                      <span
-                        id="subject"
-                        className="flex w-full items-center text-sm tracking-wide text-white sm:text-base"
-                      >
-                        <span className="truncate">{displayTitle}</span>
-                        <span className="ml-2 shrink-0">{code}</span>
-                      </span>
-                    );
-                  })()}
+                  <span
+                    id="subject"
+                    className="items-center text-sm tracking-wide text-black dark:text-white sm:text-base"
+                  >
+                    {suggestion}
+                  </span>
                 </li>
               ))}
             </ul>
