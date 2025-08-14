@@ -57,6 +57,7 @@ function PinnedSearchBar({
       setPinned(currentPinnedSubjects.includes(suggestion));
     }
 
+    setShowControls(true);
     setSuggestions([]);
     filtersNotPulled?.();
   };
@@ -110,6 +111,9 @@ function PinnedSearchBar({
 
     localStorage.setItem("userSubjects", JSON.stringify(updated));
     window.dispatchEvent(new Event("userSubjectsChanged"));
+
+    setSearchText("");
+    setPinned(false);
   };
 
   useEffect(() => {
@@ -206,7 +210,7 @@ function PinnedSearchBar({
                 <PinButton
                   isPinned={pinned}
                   onToggle={handlePinToggle}
-                  disabled={!showControls && searchText.trim() === ""}
+                  disabled={!showControls || searchText.trim() === ""}
                 />
               </div>
 
@@ -228,14 +232,14 @@ function PinnedSearchBar({
                         handlePinToggle();
                         setOpen(false);
                       }}
-                      disabled={!showControls && searchText.trim() === ""}
+                      disabled={!showControls || searchText.trim() === ""}
                     />
                     <button
                       onClick={() => {
                         handleRemoveAll();
                         setOpen(false);
                       }}
-                      className="flex items-center gap-2 rounded-full border border-[#3A3745] px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-[#1A1823]"
+                      className="flex items-center gap-2 rounded-full border border-[#3A3745] bg-[#e8e9ff] px-3 py-1.5 text-sm font-semibold text-gray-700 transition hover:bg-slate-50 dark:bg-black dark:text-white dark:hover:bg-[#1A1823]"
                     >
                       Remove All <X className="h-4 w-4" />
                     </button>
@@ -250,8 +254,11 @@ function PinnedSearchBar({
       <div className="mt-2 hidden w-full md:block">
         <div className="ml-auto w-fit">
           <button
-            onClick={handleRemoveAll}
-            className={`flex items-center gap-2 rounded-full border border-[#3A3745] px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-[#1A1823] ${showControls ? "block" : "hidden"}`}
+            onClick={() => {
+              handleRemoveAll();
+              setOpen(false);
+            }}
+            className="flex items-center gap-2 rounded-full border border-[#3A3745] bg-[#e8e9ff] px-3 py-1.5 text-sm font-semibold text-gray-700 transition hover:bg-slate-50 dark:bg-black dark:text-white dark:hover:bg-[#1A1823]"
           >
             Remove All <X className="h-4 w-4" />
           </button>
