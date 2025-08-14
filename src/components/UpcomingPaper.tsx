@@ -94,11 +94,13 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
               e.stopPropagation();
               handlePinToggle();
             }}
-            className="group z-10 mt-1"
+            className="group z-10 mt-1 text-black dark:text-white"
           >
             <Pin
-              className={`h-6 w-6 transform stroke-white transition-all ${
-                pinned ? "fill-[#A78BFA]" : "group-hover:fill-[#A78BFA]"
+              className={`h-6 w-6 transform stroke-current transition-all ${
+                pinned
+                  ? "fill-violet-400 dark:fill-violet-500"
+                  : "fill-transparent group-hover:fill-violet-400 dark:group-hover:fill-violet-500"
               } group-hover:scale-110`}
             />
           </button>
