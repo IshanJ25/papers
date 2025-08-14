@@ -22,13 +22,31 @@ function Navbar() {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  function isCourseArray(data: unknown): data is { name: string }[] {
+    return Array.isArray(data) &&
+      data.every(
+        (item) =>
+          typeof item === "object" &&
+          item !== null &&
+          "name" in item &&
+          typeof (item as { name?: unknown }).name === "string"
+      );
+  }
+
   useEffect(() => {
     async function getSubjects() {
       const res = await fetch("/api/course-list");
-      const data = await res.json();
-      setSubjects(data.map((course: { name: string }) => course.name));
+      const json = (await res.json()) as unknown;
+
+      if (isCourseArray(json)) {
+        setSubjects(json.map((course) => course.name));
+      } else {
+        setSubjects([]);
+      }
     }
-    if (pathname === "/catalogue") getSubjects();
+    if (pathname === "/catalogue") {
+      void getSubjects(); // explicitly mark as intentionally un-awaited
+    }
   }, [pathname]);
 
   const renderHomePageButtons = () => (
@@ -136,7 +154,8 @@ function Navbar() {
         </div>
 
         <div className="md:hidden">
-          <FloatingNavbar onNavigate={() => { }} />
+          {}
+          <FloatingNavbar onNavigate={() => undefined} />
         </div>
       </div>
     </div>
