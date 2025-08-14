@@ -22,6 +22,7 @@ function Navbar() {
   const [subjects, setSubjects] = useState<string[]>([]);
   const [dropdownOpen, setDropdownOpen] = useState(false);
 
+  // Type guard to safely narrow unknown JSON
   function isCourseArray(data: unknown): data is { name: string }[] {
     return Array.isArray(data) &&
       data.every(
