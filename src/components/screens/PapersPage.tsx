@@ -260,7 +260,9 @@ export default function PapersPage() {
             Submit
           </Button>
         </div>
-
+        <p className="my-8 hidden text-center font-play text-lg font-semibold md:block">
+          Upcoming Exams
+        </p>
         <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-4">
           {isLoading
             ? Array.from({ length: 4 }).map((_, idx) => (

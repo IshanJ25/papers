@@ -143,29 +143,42 @@ function SearchBarChild({
                   >
                     {subjectCounts[suggestion] ?? "0"}
                   </div>
+                  <span
+                    id="subject"
+                    className="items-center text-sm tracking-wide text-black dark:text-white sm:text-base"
+                  >
+                    {(() => {
+                      const codeMatch = /\[[^\]]+\]$/.exec(suggestion);
+                      const code = codeMatch ? codeMatch[0] : "";
+                      const title = suggestion.replace(/\s\[[^\]]+\]$/, "");
 
-                  {(() => {
-                    const codeMatch = /\[[^\]]+\]$/.exec(suggestion);
-                    const code = codeMatch ? codeMatch[0] : "";
-                    const title = suggestion.replace(/\s\[[^\]]+\]$/, "");
+                      let displayTitle = title;
+                      const isMobile =
+                        typeof window !== "undefined" &&
+                        window.innerWidth < 640;
 
-                    let displayTitle = title;
-                    if (title.length > 40) {
-                      const start = title.slice(0, 25).trim();
-                      const end = title.slice(-15).trim();
-                      displayTitle = `${start}.....${end}`;
-                    }
+                      if (isMobile) {
+                        if (title.length > 25) {
+                          const start = title.slice(0, 15).trim();
+                          const end = title.slice(-8).trim();
+                          displayTitle = `${start}.....${end}`;
+                        }
+                      } else {
+                        if (title.length > 40) {
+                          const start = title.slice(0, 25).trim();
+                          const end = title.slice(-15).trim();
+                          displayTitle = `${start}.....${end}`;
+                        }
+                      }
 
-                    return (
-                      <span
-                        id="subject"
-                        className="flex w-full items-center text-sm tracking-wide text-white sm:text-base"
-                      >
-                        <span className="truncate">{displayTitle}</span>
-                        <span className="ml-2 shrink-0">{code}</span>
-                      </span>
-                    );
-                  })()}
+                      return (
+                        <>
+                          <span className="truncate">{displayTitle}</span>
+                          <span className="ml-2 shrink-0">{code}</span>
+                        </>
+                      );
+                    })()}
+                  </span>
                 </li>
               ))}
             </ul>
