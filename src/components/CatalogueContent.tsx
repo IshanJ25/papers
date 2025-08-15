@@ -18,7 +18,7 @@ import Error from "./Error";
 import { Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Pin } from "lucide-react";
-import { StoredSubjects } from "@/interface";
+import Link from "next/link";
 import {
   getSecureUrl,
   generateFileName,
