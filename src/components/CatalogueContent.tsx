@@ -7,8 +7,7 @@ import { Button } from "@/components/ui/button";
 import {
   type IPaper,
   type Filters,
-  IRelatedSubject,
-  StoredSubjects,
+  type StoredSubjects
 } from "@/interface";
 import Card from "./Card";
 import { useRouter } from "next/navigation";
@@ -18,12 +17,12 @@ import Error from "./Error";
 import { Filter } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "./ui/sheet";
 import { Pin } from "lucide-react";
-import { StoredSubjects } from "@/interface";
 import {
   getSecureUrl,
   generateFileName,
   downloadFile,
 } from "@/util/download_paper";
+import Link from "next/link";
 
 const CatalogueContent = () => {
   const router = useRouter();
