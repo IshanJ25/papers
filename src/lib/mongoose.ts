@@ -21,10 +21,12 @@ export async function connectToDatabase() {
     return cached.conn;
   }
   if (cached && !cached.promise) {
-    const opts = {
+
+    cached.promise = mongoose.connect(MONGODB_URI, {
+      maxConnecting: 2,
       bufferCommands: false,
-    };
-    cached.promise = mongoose.connect(MONGODB_URI, opts).then((mongoose) => {
+      maxPoolSize: 10,
+    }).then((mongoose) => {
       return mongoose;
     });
   }
