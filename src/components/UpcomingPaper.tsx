@@ -17,7 +17,7 @@ interface PaperCardProps {
 export default function PaperCard({ subject, slots }: PaperCardProps) {
   const courseName = extractWithoutBracketContent(subject);
   const courseCode = extractBracketContent(subject);
-  const [paperCount, setPaperCount] = useState<number | null>(0);
+  // const [paperCount, setPaperCount] = useState<number | null>(0);
   const [pinned, setPinned] = useState<boolean>(false);
 
   const handlePinToggle = () => {
@@ -36,19 +36,19 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
   };
 
   useEffect(() => {
-    const fetchPaperCount = async () => {
-      try {
-        const response = await axios.get<{ count: number }>(
-          "/api/papers/count",
-          {
-            params: { subject },
-          },
-        );
-        setPaperCount(response.data.count);
-      } catch (error) {
-        console.error("Failed to fetch paper count:", error);
-      }
-    };
+    // const fetchPaperCount = async () => {
+    //   try {
+    //     const response = await axios.get<{ count: number }>(
+    //       "/api/papers/count",
+    //       {
+    //         params: { subject },
+    //       },
+    //     );
+    //     setPaperCount(response.data.count);
+    //   } catch (error) {
+    //     console.error("Failed to fetch paper count:", error);
+    //   }
+    // };
 
     const currentPinnedSubjects = JSON.parse(
       localStorage.getItem("userSubjects") ?? "[]",
