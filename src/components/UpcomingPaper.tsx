@@ -82,9 +82,9 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
         <div className="flex items-start justify-between">
           <h2 className="rounded-t-lg px-2 py-1 font-play text-base font-bold md:text-lg md:tracking-widest">
             {courseCode}
-            <div className="text-sm font-normal">
+            {/* <div className="text-sm font-normal">
               {paperCount ? `Papers available: ${paperCount}` : "Click to explore"}
-            </div>
+            </div> */}
           </h2>
 
           <button
