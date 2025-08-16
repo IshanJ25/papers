@@ -62,7 +62,7 @@ export default function PaperCard({ subject, slots }: PaperCardProps) {
       }
     }
 
-    void fetchPaperCount();
+    // void fetchPaperCount();
   }, [subject]);
 
   const router = useRouter();
