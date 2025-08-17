@@ -160,7 +160,7 @@ const CatalogueContent = () => {
             answerkeyCondition
           );
         });
-        setFilteredPapers(filtered.length > 0 ? filtered : papersData);
+        setFilteredPapers(filtered);
         setAppliedFilters(true);
       } catch (error) {
         setPapers([]);
